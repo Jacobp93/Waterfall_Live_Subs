@@ -307,11 +307,12 @@ opening_acv = filtered_df[
     (filtered_df['MAX_Subscription_End_Date'] >= month_start)  # Still active at the start of the month
 ]['ACV'].sum()
 
-# Calculate Expiring ACV for the selected month
+# Calculate Expiring ACV for the selected month with +1 day adjustment
 expiring_acv = filtered_df[
-    (filtered_df['MAX_Subscription_End_Date'] >= month_start) & 
-    (filtered_df['MAX_Subscription_End_Date'] <= month_end)  # Ends within the month
+    ((filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1)) >= month_start) & 
+    ((filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1)) <= month_end)  # Ends within the month
 ]['ACV'].sum()
+
 
 # Calculate Renewed ACV for the selected month
 renewed_acv = filtered_df[
