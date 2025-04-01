@@ -304,11 +304,21 @@ expiring_acv = filtered_df[
     (filtered_df['MAX_Subscription_End_Date'] <= month_end)  # Ends within the month
 ]['ACV'].sum()
 
-# Calculate Renewed ACV for the selected month
+
+filtered_df['Renewal_Year'] = filtered_df['Renewal_Year'].fillna(0).astype(int)
+filtered_df['Renewal_Month'] = filtered_df['Renewal_Month'].fillna(0).astype(int)
+
+# Debugging: Print unique values to confirm filtering
+st.write("Unique Renewal Years:", filtered_df['Renewal_Year'].unique())
+st.write("Unique Renewal Months:", filtered_df['Renewal_Month'].unique())
+
+# Now filter correctly
 renewed_acv = filtered_df[
-    (filtered_df['Final_Renewal_Status'] == "Renewed") & (filtered_df['Renewal_Year'] == selected_year)&
-    (filtered_df['Renewal_Month'] == selected_month)  # Renewed in the selected month
+    (filtered_df['Final_Renewal_Status'] == "Renewed") & 
+    (filtered_df['Renewal_Year'] == int(selected_year)) &
+    (filtered_df['Renewal_Month'] == int(selected_month))
 ]['ACV'].sum()
+
 
 # Calculate New Business ACV for the selected month
 new_business_acv = filtered_df[
