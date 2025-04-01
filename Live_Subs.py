@@ -84,7 +84,7 @@ WITH SubscriptionData AS (
 FORMAT(
     DATEADD(DAY, 1, MAX(line_item.property_subscription_end_date)), 
     'yyyy-MM'
-) AS Renewal_Period,
+) AS Renewal_Period_Date,
 
         -- ACV Calculation (Annual Contract Value)
         ROUND(
