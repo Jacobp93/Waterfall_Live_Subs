@@ -1,4 +1,5 @@
 from sqlalchemy import create_engine
+import pyodbc as db
 import pandas as pd
 import streamlit as st
 import plotly.graph_objects as go
@@ -178,33 +179,6 @@ ORDER BY property_name, MAX_Subscription_End_Date DESC;
 ----------------------------------------------------------------
 
 """
-
-
-
-# Load the custom password from the secrets
-gate_password = st.secrets["app"]["GATE_PASSWORD"]
-
-# Create a password input prompt for the user
-user_password = st.text_input("Enter the gate password", type="password")
-
-# Check if the entered password matches the stored gate password
-if user_password == gate_password:
-    st.success("Password correct! You have access to the app.")
-    
-    # Your SQL database connection code here
-    # sql_server = st.secrets["sql"]["SQL_SERVER"]
-    # sql_database_1 = st.secrets["sql"]["SQL_DATABASE_1"]
-    # sql_uid = st.secrets["sql"]["SQL_UID"]
-    # sql_pass = st.secrets["sql"]["SQL_PASS"]
-    
-    # Establish your DB connection and continue with the app
-    # Example:
-    # engine = establish_db_connection()
-    # df = load_data_from_sql(sql_query)
-    # st.write(df)
-    
-else:
-    st.error("Incorrect password! Access denied.")
 
 
 # Function to extract year from Renewal_Period_Date
