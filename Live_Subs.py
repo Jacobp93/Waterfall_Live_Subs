@@ -305,10 +305,9 @@ expiring_acv = filtered_df[
 ]['ACV'].sum()
 
 # Calculate Renewed ACV for the selected month
-expiring_acv = filtered_df[
-    (filtered_df['MAX_Subscription_End_Date'] >= month_start) & 
-    (filtered_df['MAX_Subscription_End_Date'] <= month_end) &  # Ends within the month
-    (filtered_df['MAX_Subscription_End_Date'].dt.year == selected_year)  # Ensuring correct year
+renewed_acv = filtered_df[
+    (filtered_df['Final_Renewal_Status'] == "Renewed") &
+    (filtered_df['Renewal_Month'] == selected_month)  # Renewed in the selected month
 ]['ACV'].sum()
 
 # Calculate New Business ACV for the selected month
@@ -325,9 +324,6 @@ closing_acv = opening_acv - expiring_acv + renewed_acv + new_business_acv
 waterfall_values = [opening_acv, -expiring_acv, renewed_acv, new_business_acv, closing_acv]
 waterfall_labels = ["Opening ACV", "Expiring", "Renewed", "New Business", "Closing ACV"]
 waterfall_colors = ["blue", "red", "green", "green", "blue"]  # Color coding
-
-
-
 
 
 # Create Waterfall Chart
