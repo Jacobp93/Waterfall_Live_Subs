@@ -81,7 +81,10 @@ WITH SubscriptionData AS (
         FORMAT(MIN(line_item.property_subscription_start_date), 'yyyy-MM-dd') AS Begin_Period_Date,
 
         -- Renewal Period (End Date)
-        FORMAT(MAX(line_item.property_subscription_end_date), 'yyyy-MM-dd') AS Renewal_Period_Date,
+FORMAT(
+    DATEADD(DAY, 1, MAX(line_item.property_subscription_end_date)), 
+    'yyyy-MM'
+) AS Renewal_Period,
 
         -- ACV Calculation (Annual Contract Value)
         ROUND(
