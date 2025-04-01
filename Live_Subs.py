@@ -204,7 +204,7 @@ st.sidebar.header("Filters")
 selected_category = st.sidebar.selectbox("Select Product Category", ["All"] + list(df['property_product_category'].dropna().unique()))
 selected_bundle = st.sidebar.selectbox("Select Product Bundle", ["All"] + list(df['property_bundle'].dropna().unique()))
 selected_year = st.sidebar.selectbox("Select Year", range(2020, 2031), index=5)  # Adjust range as needed
-selected_region =st.sidebar.selectbox("Select Region",["All"] +list(df['property_region_dfe_'].dropna().unique()))
+selected_region = st.sidebar.selectbox("Select Region",["All"] +list(df['property_region_dfe_'].dropna().unique()))
 
 # ACV Calculations for Selected Year
 start_date = pd.to_datetime(f"{selected_year}-01-01").date()
@@ -215,7 +215,7 @@ if selected_category != "All":
     filtered_df = filtered_df[filtered_df['property_product_category'] == selected_category]
 if selected_bundle != "All":
     filtered_df = filtered_df[filtered_df['property_bundle'] == selected_bundle]
-if selected_bundle != "All":
+if selected_region != "All":
     filtered_df = filtered_df[filtered_df['property_region_dfe_'] == selected_region]
 
 # ACV Calculations
