@@ -307,7 +307,7 @@ expiring_acv = filtered_df[
 # Calculate Renewed ACV for the selected month
 renewed_acv = filtered_df[
     (filtered_df['Final_Renewal_Status'] == "Renewed") & (filtered_df['Renewal_Year'] == selected_year)&
-    (filtered_df['Renewal_Month'] == month_start)  # Renewed in the selected month
+    (filtered_df['Renewal_Month'] == selected_month)  # Renewed in the selected month
 ]['ACV'].sum()
 
 # Calculate New Business ACV for the selected month
