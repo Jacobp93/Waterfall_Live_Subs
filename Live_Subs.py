@@ -201,10 +201,11 @@ df['Renewal_Year'] = df['Renewal_Period_Date'].dt.year.fillna(0).astype(int)
 
 # Sidebar Filters
 st.sidebar.header("Filters")
+selected_region = st.sidebar.selectbox("Select Region",["All"] +list(df['property_region_dfe_'].dropna().unique()))
 selected_category = st.sidebar.selectbox("Select Product Category", ["All"] + list(df['property_product_category'].dropna().unique()))
 selected_bundle = st.sidebar.selectbox("Select Product Bundle", ["All"] + list(df['property_bundle'].dropna().unique()))
 selected_year = st.sidebar.selectbox("Select Year", range(2020, 2031), index=5)  # Adjust range as needed
-selected_region = st.sidebar.selectbox("Select Region",["All"] +list(df['property_region_dfe_'].dropna().unique()))
+
 
 # ACV Calculations for Selected Year
 start_date = pd.to_datetime(f"{selected_year}-01-01").date()
