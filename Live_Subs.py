@@ -63,6 +63,7 @@ WITH SubscriptionData AS (
         deal.deal_pipeline_id,
         company.id AS Company_ID, 
         company.property_name,
+		company.property_region_dfe_,
         deal.deal_pipeline_stage_id,
         aggregated.property_bundle,
         aggregated.property_product_category, -- Track Product Category for Renewal Logic
@@ -136,6 +137,7 @@ WITH SubscriptionData AS (
         deal.deal_pipeline_id,
         company.id,
         company.property_name,
+		company.property_region_dfe_,
         deal.deal_pipeline_stage_id,
         aggregated.property_bundle,
         aggregated.property_product_category,
