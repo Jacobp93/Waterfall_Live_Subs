@@ -256,13 +256,22 @@ fig_acv.update_layout(
 st.plotly_chart(fig_acv)
 
 # Display ACV Values
-st.write(f"### ACV Breakdown for {selected_year}")
-st.write(f"**Opening ACV:** £{opening_acv:,.2f}")
-st.write(f"**Expiring ACV:** £{expiring_acv:,.2f}")
-st.write(f"**Renewed ACV:** £{renewed_acv:,.2f}")
-st.write(f"**New Business ACV:** £{new_business_acv:,.2f}")
-st.write(f"**Closing ACV:** £{closing_acv:,.2f}")
+with col1:
+    st.metric(label="Opening ACV", value=f"£{opening_acv:,.2f}")
 
+with col2:
+    st.metric(label="Expiring ACV", value=f"£{expiring_acv:,.2f}")
+
+with col3:
+    st.metric(label="Renewed ACV", value=f"£{renewed_acv:,.2f}")
+
+col4, col5, _ = st.columns([1, 1, 1])  # Leave an empty column for spacing
+
+with col4:
+    st.metric(label="New Business ACV", value=f"£{new_business_acv:,.2f}")
+
+with col5:
+    st.metric(label="Closing ACV", value=f"£{closing_acv:,.2f}")
 
 
 # User selects year and month
