@@ -226,8 +226,8 @@ if selected_region != "All":
 opening_acv = filtered_df[(filtered_df['MIN_Subscription_Start_Date'] <= start_date) & 
                           (filtered_df['MAX_Subscription_End_Date'] >= start_date)]['ACV'].sum()
 
-expiring_acv = filtered_df[(filtered_df['MAX_Subscription_End_Date'] >= start_date) & 
-                           (filtered_df['MAX_Subscription_End_Date'] <= end_date)]['ACV'].sum()
+expiring_acv = filtered_df[(filtered_df['Renewal_Year'] >= start_date) & 
+                           (filtered_df['Renewal_Year'] <= end_date)]['ACV'].sum()
 
 renewed_acv = filtered_df[(filtered_df['Final_Renewal_Status'] == "Renewed") & 
                           (filtered_df['Renewal_Year'] == selected_year)]['ACV'].sum()
