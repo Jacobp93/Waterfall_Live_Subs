@@ -255,9 +255,12 @@ fig_acv.update_layout(
 
 st.plotly_chart(fig_acv)
 
-# Create three columns for better space utilization
-col1, col2, col3 = st.columns(3)
-# Display ACV Values
+# Title with Selected Year
+st.markdown(f"<h2 style='text-align: center;'>ACV Breakdown for {selected_year}</h2>", unsafe_allow_html=True)
+
+# Create two rows of columns for better space utilization
+col1, col2, col3, col4, col5 = st.columns(5)
+
 with col1:
     st.metric(label="Opening ACV", value=f"£{opening_acv:,.2f}")
 
@@ -267,14 +270,11 @@ with col2:
 with col3:
     st.metric(label="Renewed ACV", value=f"£{renewed_acv:,.2f}")
 
-col4, col5, _ = st.columns([1, 1, 1])  # Leave an empty column for spacing
-
 with col4:
     st.metric(label="New Business ACV", value=f"£{new_business_acv:,.2f}")
 
 with col5:
     st.metric(label="Closing ACV", value=f"£{closing_acv:,.2f}")
-
 
 # User selects year and month
 selected_month = st.sidebar.selectbox("Select Month", range(1, 13), format_func=lambda x: pd.to_datetime(f"{selected_year}-{x:02d}-01").strftime('%B'))
