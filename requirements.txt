@@ -3,3 +3,4 @@ pyodbc==5.2.0
 plotly==5.3.1
 numpy==1.26.0 
 pandas==2.2.0
+altair==5.5.0
