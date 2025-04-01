@@ -255,6 +255,8 @@ fig_acv.update_layout(
 
 st.plotly_chart(fig_acv)
 
+# Create three columns for better space utilization
+col1, col2, col3 = st.columns(3)
 # Display ACV Values
 with col1:
     st.metric(label="Opening ACV", value=f"£{opening_acv:,.2f}")
