@@ -309,8 +309,8 @@ opening_acv = filtered_df[
 
 # Calculate Expiring ACV for the selected month
 expiring_acv = filtered_df[
-    (filtered_df['Renewal_Month'] >= month_start) & 
-    (filtered_df['Renewal_Month'] <= month_end)  # Ends within the month
+    (filtered_df['MAX_Subscription_End_Date'] >= month_start) & 
+    (filtered_df['MAX_Subscription_End_Date'] <= month_end)  # Ends within the month
 ]['ACV'].sum()
 
 # Calculate Renewed ACV for the selected month
