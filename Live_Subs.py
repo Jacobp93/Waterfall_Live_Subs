@@ -1,8 +1,9 @@
-import pyodbc
+from sqlalchemy import create_engine
 import pandas as pd
 import streamlit as st
 import plotly.graph_objects as go
 import re
+
 
 # Retrieve credentials from Streamlit secrets
 sql_server = st.secrets["sql"]["SQL_SERVER"]
@@ -11,36 +12,37 @@ sql_uid = st.secrets["sql"]["SQL_UID"]
 sql_pass = st.secrets["sql"]["SQL_PASS"]
 sql_driver = "ODBC Driver 17 for SQL Server"  # Update as necessary
 
+
+
+
 # Define the function to establish a DB connection
 def establish_db_connection():
-    """Establish a connection to SQL Server using pyodbc."""
+    """Establish a connection to SQL Server using SQLAlchemy."""
     try:
-        conn_str = (
-            f"DRIVER={{{sql_driver}}};"
-            f"SERVER={sql_server};"
-            f"DATABASE={sql_database_1};"
-            f"UID={sql_uid};"
-            f"PWD={sql_pass};"
-        )
-        conn = pyodbc.connect(conn_str)
-        print("PyODBC connection established!")
-        return conn
+        # Constructing the connection string for SQLAlchemy
+        conn_str = f"mssql+pyodbc://{sql_uid}:{sql_pass}@{sql_server}/{sql_database_1}?driver={sql_driver}"
+        
+        # Creating the engine with the connection string
+        engine = create_engine(conn_str)
+        
+        # Check if the connection is successful
+        print("SQLAlchemy connection established!")
+        return engine
     except Exception as e:
         print(f"Error connecting to the database: {e}")
         return None
 
 @st.cache_data
 def load_data_from_sql(query):
-    """Load data from SQL Server into a pandas DataFrame using pyodbc."""
-    conn = establish_db_connection()
-    if conn is None:
+    """Load data from SQL Server into a pandas DataFrame using SQLAlchemy."""
+    engine = establish_db_connection()
+    if engine is None:
         st.error("Failed to establish database connection.")
         return None
     
     try:
-        df = pd.read_sql(query, conn)
-        conn.close()
-        
+        # Use the SQLAlchemy engine to load the data into a pandas DataFrame
+        df = pd.read_sql(query, engine)
         if df.empty:
             st.warning("No data returned from the query.")
         else:
@@ -50,6 +52,7 @@ def load_data_from_sql(query):
         st.error(f"Error loading data: {e}")
         print(f"Error: {e}")  # For debugging in the terminal
         return None
+    
     
 # SQL Query to extract subscription data
 sql_query = """
