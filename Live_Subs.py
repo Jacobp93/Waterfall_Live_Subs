@@ -295,38 +295,11 @@ st.plotly_chart(fig_acv)
 # Title with Selected Year
 
 # User selects year and month
-# User selects multiple months
-# User selects multiple months
-selected_month = st.sidebar.multiselect(
-    "Select Months", 
-    options=list(range(1, 13)), 
-    format_func=lambda x: pd.to_datetime(f"{selected_year}-{x:02d}-01").strftime('%B')
-)
+selected_month = st.sidebar.slider("Select Month", range(1, 13), format_func=lambda x: pd.to_datetime(f"{selected_year}-{x:02d}-01").strftime('%B'))
 
-# Debugging: Print selected values
-st.write("Selected months:", selected_month)
-st.write("Selected Year:", selected_year, "Type:", type(selected_year))
-
-# Convert year if needed
-selected_year = int(selected_year)
-
-# Ensure at least one month is selected
-if selected_month:
-    selected_month = [int(m) for m in selected_month]  # Ensure all values are integers
-    min_month = min(selected_month)  # Get earliest selected month
-    max_month = max(selected_month)  # Get latest selected month
-
-    # Convert to date range
-    month_start = pd.to_datetime(f"{selected_year}-{min_month:02d}-01").date()
-    month_end = (pd.to_datetime(f"{selected_year}-{max_month:02d}-01") + pd.offsets.MonthEnd(0)).date()
-
-    # Debugging: Print calculated dates
-    st.write("Month Start:", month_start)
-    st.write("Month End:", month_end)
-
-else:
-    st.warning("Please select at least one month.")
-    month_start, month_end = None, None
+# Define time period for the selected month
+month_start = pd.to_datetime(f"{selected_year}-{selected_month:02d}-01").date()
+month_end = (pd.to_datetime(month_start) + pd.offsets.MonthEnd(0)).date()
 
 # Calculate Opening ACV for the selected month
 opening_acv = filtered_df[
