@@ -295,7 +295,12 @@ st.plotly_chart(fig_acv)
 # Title with Selected Year
 
 # User selects year and month
-selected_month = st.sidebar.slider("Select Month", range(1, 13), format_func=lambda x: pd.to_datetime(f"{selected_year}-{x:02d}-01").strftime('%B'))
+# User selects multiple months
+selected_months = st.sidebar.multiselect(
+    "Select Months", 
+    options=list(range(1, 13)), 
+    format_func=lambda x: pd.to_datetime(f"{selected_year}-{x:02d}-01").strftime('%B')
+)
 
 # Define time period for the selected month
 month_start = pd.to_datetime(f"{selected_year}-{selected_month:02d}-01").date()
