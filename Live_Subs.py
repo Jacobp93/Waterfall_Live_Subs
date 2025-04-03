@@ -296,7 +296,7 @@ st.plotly_chart(fig_acv)
 
 # User selects year and month
 # User selects multiple months
-selected_months = st.sidebar.multiselect(
+selected_month = st.sidebar.multiselect(
     "Select Months", 
     options=list(range(1, 13)), 
     format_func=lambda x: pd.to_datetime(f"{selected_year}-{x:02d}-01").strftime('%B')
