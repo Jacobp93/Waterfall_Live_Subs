@@ -295,7 +295,7 @@ st.plotly_chart(fig_acv)
 # Title with Selected Year
 
 # User selects year and month
-selected_month = st.sidebar.slider("Select Month", range(1, 13), format_func=lambda x: pd.to_datetime(f"{selected_year}-{x:02d}-01").strftime('%B'))
+selected_month = st.sidebar.selectbox("Select Month", range(1, 13), format_func=lambda x: pd.to_datetime(f"{selected_year}-{x:02d}-01").strftime('%B'))
 
 # Define time period for the selected month
 month_start = pd.to_datetime(f"{selected_year}-{selected_month:02d}-01").date()
@@ -307,12 +307,11 @@ opening_acv = filtered_df[
     (filtered_df['MAX_Subscription_End_Date'] >= month_start)  # Still active at the start of the month
 ]['ACV'].sum()
 
-# Calculate Expiring ACV for the selected month with +1 day adjustment
+# Calculate Expiring ACV for the selected month
 expiring_acv = filtered_df[
-    ((filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1)) >= month_start) & 
-    ((filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1)) <= month_end)  # Ends within the month
+    (filtered_df['MAX_Subscription_End_Date'] >= month_start) & 
+    (filtered_df['MAX_Subscription_End_Date'] <= month_end)  # Ends within the month
 ]['ACV'].sum()
-
 
 # Calculate Renewed ACV for the selected month
 renewed_acv = filtered_df[
