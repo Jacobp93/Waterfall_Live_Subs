@@ -363,22 +363,22 @@ if selected_months:
         ]['ACV'].sum()
 
         # New Business
-        new_business = filtered_df[
+    new_business = filtered_df[
             (filtered_df['MIN_Subscription_Start_Date'] >= month_start) &
             (filtered_df['MIN_Subscription_Start_Date'] <= month_end) &
             (filtered_df['deal_pipeline_id'] == "default")
         ]['ACV'].sum()
 
         # Append each to chart series
-        values.extend([-expiring, renewed, new_business])
-        labels.extend([
+    values.extend([-expiring, renewed, new_business])
+    labels.extend([
             f"{calendar.month_abbr[month]} Expiring",
             f"{calendar.month_abbr[month]} Renewed",
             f"{calendar.month_abbr[month]} New"
         ])
 
         # Update rolling ACV
-        rolling_acv = rolling_acv - expiring + renewed + new_business
+    rolling_acv = rolling_acv - expiring + renewed + new_business
 
     # Final closing ACV
     labels.append("Closing ACV")
