@@ -299,8 +299,6 @@ with col5:
 
 
 
-st.markdown(f"<h2 style='text-align: center;'>ACV Breakdown for {Se}</h2>", unsafe_allow_html=True)
-
 
 # Map month numbers to month names and reverse
 month_map = {i: pd.to_datetime(f"2024-{i:02d}-01").strftime('%B') for i in range(1, 13)}
