@@ -326,7 +326,7 @@ if selected_months:
     last_month_end = (pd.to_datetime(f"{selected_year}-{last_month:02d}-01") + pd.offsets.MonthEnd(0)).date()
 
 
-    st.markdown(f"<h2 style='text-align: center;'>ACV Breakdown for {selected_months}</h2>", unsafe_allow_html=True)
+    st.markdown(f"<h2 style='text-align: center;'>ACV Breakdown for {selected_month_names}</h2>", unsafe_allow_html=True)
 
 
     # Calculate opening ACV at start of first selected month
