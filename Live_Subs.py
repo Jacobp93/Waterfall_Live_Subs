@@ -348,7 +348,7 @@ if selected_months:
 
         # Expiring
         # Expiring ACV falls in the *following* month if it expires on the last day of current month
-    expiring = filtered_df[
+        expiring = filtered_df[
     (filtered_df['MAX_Subscription_End_Date'] >= month_start + timedelta(days=1)) & 
     (filtered_df['MAX_Subscription_End_Date'] <= month_end + timedelta(days=1))
 ]['ACV'].sum()
