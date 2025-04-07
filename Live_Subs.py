@@ -348,11 +348,11 @@ if selected_months:
         month_end = (pd.to_datetime(month_start) + pd.offsets.MonthEnd(0)).date()
 
         # Expiring
-    expiring = filtered_df[
+        expiring = filtered_df[
         # Check if subscription ends on the last day of the current month
         (filtered_df['MAX_Subscription_End_Date'] >= month_end) & 
         (filtered_df['MAX_Subscription_End_Date'] <= month_end + timedelta(days=1))
-    ]['ACV'].sum()
+        ]['ACV'].sum()
 
         # Renewed
         renewed = filtered_df[
