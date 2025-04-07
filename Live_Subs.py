@@ -270,7 +270,6 @@ fig_acv.update_layout(
 
 st.plotly_chart(fig_acv)
 
-# --- Month Selection (Multi-Select Box) ---
 
 # Sidebar for month selection
 month_map = {i: calendar.month_name[i] for i in range(1, 13)}  # Map month numbers to month names
@@ -319,21 +318,25 @@ if selected_months:
     for month in selected_months:
         # Get the first and last day of the month
         month_start = pd.to_datetime(f"2024-{month:02d}-01")
-        month_end = (month_start + pd.offsets.MonthEnd(0)).date()
+        month_end = (month_start + pd.offsets.MonthEnd(0))
+
+        # Convert to Timestamp for proper comparison
+        month_start_ts = pd.Timestamp(month_start)
+        month_end_ts = pd.Timestamp(month_end)
 
         # Calculate Opening ACV at the start of the first selected month
         if month == selected_months[0]:
             opening_acv = filtered_df[
-                (filtered_df['MIN_Subscription_Start_Date'] <= month_start) & 
-                (filtered_df['MAX_Subscription_End_Date'] >= month_start)
+                (filtered_df['MIN_Subscription_Start_Date'] <= month_start_ts) & 
+                (filtered_df['MAX_Subscription_End_Date'] >= month_start_ts)
             ]['ACV'].sum()
             rolling_acv = opening_acv
             values.append(opening_acv)
 
         # Expiring ACV: Subscriptions expiring in this month
         expiring = filtered_df[
-            (filtered_df['MAX_Subscription_End_Date'] >= month_start) & 
-            (filtered_df['MAX_Subscription_End_Date'] <= month_end)
+            (filtered_df['MAX_Subscription_End_Date'] >= month_start_ts) & 
+            (filtered_df['MAX_Subscription_End_Date'] <= month_end_ts)
         ]['ACV'].sum()
 
         # Renewed ACV: Subscriptions renewed in this month
@@ -345,8 +348,8 @@ if selected_months:
 
         # New Business ACV: New business in this month
         new_business = filtered_df[
-            (filtered_df['MIN_Subscription_Start_Date'] >= month_start) & 
-            (filtered_df['MIN_Subscription_Start_Date'] <= month_end) & 
+            (filtered_df['MIN_Subscription_Start_Date'] >= month_start_ts) & 
+            (filtered_df['MIN_Subscription_Start_Date'] <= month_end_ts) & 
             (filtered_df['deal_pipeline_id'] == "default")
         ]['ACV'].sum()
 
