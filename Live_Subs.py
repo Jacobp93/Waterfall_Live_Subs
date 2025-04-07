@@ -271,13 +271,6 @@ fig_acv.update_layout(
 st.plotly_chart(fig_acv)
 
 
-# Sidebar date range selection
-start_date, end_date = st.sidebar.date_input(
-    "Select Date Range", 
-    value=(pd.to_datetime("2024-01-01").date(), pd.to_datetime("2024-12-31").date())
-)
-
-
 # Sample DataFrame (replace this with your actual DataFrame)
 # Assuming 'filtered_df' contains the necessary data with proper columns such as 'ACV', 'Subscription Start Date', 'Subscription End Date', 'Renewal_Year', 'Renewal_Month', etc.
 
