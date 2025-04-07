@@ -406,13 +406,13 @@ if selected_months:
 spacer1, col1, col2, col3, spacer2 = st.columns([2, 2.5, 2.5, 2.5, 2])
 
 with col1:
-    st.markdown("<p style='font-size:14px; text-align:center;'>Expiring ACV</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size:14px; text-align:center;'></p>", unsafe_allow_html=True)
     st.write(f"**Opening ACV:** £{opening_acv:,.2f}")
 
 with col2:
-    st.markdown("<p style='font-size:14px; text-align:center;'>Renewed ACV</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size:14px; text-align:center;'></p>", unsafe_allow_html=True)
     st.write(f"**Closing ACV:** £{rolling_acv:,.2f}")
 
 with col3:
-    st.markdown("<p style='font-size:14px; text-align:center;'>New Business ACV</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size:14px; text-align:center;'></p>", unsafe_allow_html=True)
     st.write(f"**Net Change:** £{(rolling_acv - opening_acv):+,.2f}")
