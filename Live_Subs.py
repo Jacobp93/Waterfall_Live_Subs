@@ -270,13 +270,6 @@ fig_acv.update_layout(
 
 st.plotly_chart(fig_acv)
 
-# --- Month Selection (Multi-Select Box) ---
-
-
-import pandas as pd
-import plotly.graph_objects as go
-import streamlit as st
-import calendar
 
 # Define the month mapping
 month_map = {i: pd.to_datetime(f"2024-{i:02d}-01").strftime('%B') for i in range(1, 13)}
@@ -324,14 +317,15 @@ else:
 
         # Expiring ACV for the current month
         expiring_acv = filtered_df[
-            (filtered_df['MAX_Subscription_End_Date'] >= month_start) &
-            (filtered_df['MAX_Subscription_End_Date'] <= month_end)
+            (filtered_df['Renewal_Year'] == 2024) &  # Assuming we're working within 2024 for example
+            (filtered_df['Renewal_Month'] == month_num)  # Filter for the correct month
         ]['ACV'].sum()
 
         # Renewed ACV for the current month
         renewed_acv = filtered_df[
             (filtered_df['Final_Renewal_Status'] == "Renewed") &
-            (filtered_df['Renewal_Month'] == month_num)
+            (filtered_df['Renewal_Year'] == 2024) &  # Assuming we want the year to be 2024
+            (filtered_df['Renewal_Month'] == month_num)  # Filter for the correct month
         ]['ACV'].sum()
 
         # New Business ACV for the current month
