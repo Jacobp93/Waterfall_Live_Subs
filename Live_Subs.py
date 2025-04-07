@@ -5,6 +5,8 @@ import plotly.graph_objects as go
 import re
 import datetime
 import calendar
+from datetime import timedelta
+
 
 
 # Retrieve credentials from Streamlit secrets
@@ -347,13 +349,15 @@ if selected_months:
         month_end = (pd.to_datetime(month_start) + pd.offsets.MonthEnd(0)).date()
 
         # Expiring
-        expiring = filtered_df[
-            (filtered_df['MAX_Subscription_End_Date'] >= month_start) &
-            (filtered_df['MAX_Subscription_End_Date'] <= month_end)
+        # Expiring ACV falls in the *following* month if it expires on the last day of current month
+    expiring = filtered_df[
+            (filtered_df['MAX_Subscription_End_Date'] >= month_start + timedelta(days=1)) & 
+            (filtered_df['MAX_Subscription_End_Date'] <= month_end + timedelta(days=1))
         ]['ACV'].sum()
 
+
         # Renewed
-        renewed = filtered_df[
+    renewed = filtered_df[
             (filtered_df['Final_Renewal_Status'] == "Renewed") &
             (filtered_df['Renewal_Year'] == selected_year) &
             (filtered_df['Renewal_Month'] == month)
