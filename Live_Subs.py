@@ -299,6 +299,7 @@ with col5:
 
 
 
+st.markdown(f"<h2 style='text-align: center;'>ACV Breakdown for {Se}</h2>", unsafe_allow_html=True)
 
 
 # Map month numbers to month names and reverse
@@ -312,6 +313,10 @@ selected_month_names = st.sidebar.multiselect(
     default=["January"],
 )
 
+
+
+
+
 # Convert to sorted month numbers
 selected_months = sorted([month_name_to_num[name] for name in selected_month_names])
 
@@ -321,6 +326,10 @@ if selected_months:
     last_month = selected_months[-1]
     first_month_start = pd.to_datetime(f"{selected_year}-{first_month:02d}-01").date()
     last_month_end = (pd.to_datetime(f"{selected_year}-{last_month:02d}-01") + pd.offsets.MonthEnd(0)).date()
+
+
+    st.markdown(f"<h2 style='text-align: center;'>ACV Breakdown for {selected_months}</h2>", unsafe_allow_html=True)
+
 
     # Calculate opening ACV at start of first selected month
     opening_acv = filtered_df[
@@ -397,20 +406,16 @@ if selected_months:
 
 col1, col2, col3, col4 = st.columns([1.5, 1.5, 1.5, 1.5])
 
-# Displaying ACV metrics with custom styling for better fit
-with col1:
-    st.markdown("<p style='font-size:14px; text-align:center;'>Opening ACV</p>", unsafe_allow_html=True)
-    st.write(f"### Total ACV Movement: {calendar.month_name[first_month]} to {calendar.month_name[last_month]} {selected_year}")
 
-with col2:
+with col1:
     st.markdown("<p style='font-size:14px; text-align:center;'>Expiring ACV</p>", unsafe_allow_html=True)
     st.write(f"**Opening ACV:** £{opening_acv:,.2f}")
 
-with col3:
+with col2:
     st.markdown("<p style='font-size:14px; text-align:center;'>Renewed ACV</p>", unsafe_allow_html=True)
     st.write(f"**Closing ACV:** £{rolling_acv:,.2f}")
 
-with col4:
+with col3:
     st.markdown("<p style='font-size:14px; text-align:center;'>New Business ACV</p>", unsafe_allow_html=True)
     st.write(f"**Net Change:** £{(rolling_acv - opening_acv):+,.2f}")
 
