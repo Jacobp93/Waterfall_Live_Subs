@@ -352,8 +352,8 @@ if selected_months:
 
     # Expiring ACV: Check if the subscription ends between the current month end and next month end
         expiring = filtered_df[
-        (filtered_df['MAX_Subscription_End_Date'] > month_end) &  # Expiry date is after current month's end
-        (filtered_df['MAX_Subscription_End_Date'] <= next_month_end)  # Expiry date is before or on next month's end
+        (filtered_df['Renewal_Year'] == selected_year) &
+        (filtered_df['Renewal_Month'] == month)
         ]['ACV'].sum()
 
         # Renewed
