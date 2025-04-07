@@ -273,58 +273,69 @@ st.plotly_chart(fig_acv)
 # --- Month Selection (Multi-Select Box) ---
 
 
-# Define wider column proportions to fit values properly
-col1, col2, col3, col4, col5 = st.columns([1.5, 1.5, 1.5, 1.5, 1.5])
+import pandas as pd
+import calendar
+import plotly.graph_objects as go
+import streamlit as st
+from datetime import timedelta
 
-# Displaying ACV metrics with custom styling for better fit
-with col1:
-    st.markdown("<p style='font-size:14px; text-align:center;'>Opening ACV</p>", unsafe_allow_html=True)
-    st.write(f"**£{opening_acv:,.2f}**")
+# Sidebar for month selection
+month_map = {i: calendar.month_name[i] for i in range(1, 13)}  # Map month numbers to month names
+month_name_to_num = {v: k for k, v in month_map.items()}  # Reverse map for easy access
 
-with col2:
-    st.markdown("<p style='font-size:14px; text-align:center;'>Expiring ACV</p>", unsafe_allow_html=True)
-    st.write(f"**£{expiring_acv:,.2f}**")
+# Sidebar for multi-select month names
+selected_month_names = st.sidebar.multiselect(
+    "Select Month(s)", list(month_name_to_num.keys()), default=["January"]
+)
 
-with col3:
-    st.markdown("<p style='font-size:14px; text-align:center;'>Renewed ACV</p>", unsafe_allow_html=True)
-    st.write(f"**£{renewed_acv:,.2f}**")
+# Convert to sorted month numbers
+selected_months = sorted([month_name_to_num[name] for name in selected_month_names])
 
-with col4:
-    st.markdown("<p style='font-size:14px; text-align:center;'>New Business ACV</p>", unsafe_allow_html=True)
-    st.write(f"**£{new_business_acv:,.2f}**")
+if selected_months:
+    # Define wider column proportions to fit values properly
+    col1, col2, col3, col4, col5 = st.columns([1.5, 1.5, 1.5, 1.5, 1.5])
 
-with col5:
-    st.markdown("<p style='font-size:14px; text-align:center;'>Closing ACV</p>", unsafe_allow_html=True)
-    st.write(f"**£{closing_acv:,.2f}**")
+    # Displaying ACV metrics with custom styling for better fit
+    with col1:
+        st.markdown("<p style='font-size:14px; text-align:center;'>Opening ACV</p>", unsafe_allow_html=True)
+        st.write(f"**£{opening_acv:,.2f}**")
 
-# Sidebar for Date Range Selection
-start_date = st.sidebar.date_input("Start Date", pd.to_datetime("2024-01-01"))
-end_date = st.sidebar.date_input("End Date", pd.to_datetime("2024-06-30"))
+    with col2:
+        st.markdown("<p style='font-size:14px; text-align:center;'>Expiring ACV</p>", unsafe_allow_html=True)
+        st.write(f"**£{expiring_acv:,.2f}**")
 
-# Ensure that start_date and end_date are valid
-if start_date and end_date and start_date <= end_date:
+    with col3:
+        st.markdown("<p style='font-size:14px; text-align:center;'>Renewed ACV</p>", unsafe_allow_html=True)
+        st.write(f"**£{renewed_acv:,.2f}**")
 
-    # Create a list of months in the date range
-    months_in_range = pd.date_range(start_date, end_date, freq='MS').month
+    with col4:
+        st.markdown("<p style='font-size:14px; text-align:center;'>New Business ACV</p>", unsafe_allow_html=True)
+        st.write(f"**£{new_business_acv:,.2f}**")
 
-    # Initialize the variables for the calculations
+    with col5:
+        st.markdown("<p style='font-size:14px; text-align:center;'>Closing ACV</p>", unsafe_allow_html=True)
+        st.write(f"**£{closing_acv:,.2f}**")
+
+    # Initialize variables
     opening_acv = 0
     rolling_acv = 0
     values = []
     labels = ["Opening ACV"]
 
-    # Calculate opening ACV at the start of the first selected month
-    opening_acv = filtered_df[
-        (filtered_df['MIN_Subscription_Start_Date'] <= start_date) & 
-        (filtered_df['MAX_Subscription_End_Date'] >= start_date)
-    ]['ACV'].sum()
-    rolling_acv = opening_acv
-    values.append(opening_acv)
-
-    # Loop through each month in the selected range
-    for month in months_in_range:
-        month_start = pd.to_datetime(f"{start_date.year}-{month:02d}-01")
+    # Loop through selected months
+    for month in selected_months:
+        # Get the first and last day of the month
+        month_start = pd.to_datetime(f"2024-{month:02d}-01")
         month_end = (month_start + pd.offsets.MonthEnd(0)).date()
+
+        # Calculate Opening ACV at the start of the first selected month
+        if month == selected_months[0]:
+            opening_acv = filtered_df[
+                (filtered_df['MIN_Subscription_Start_Date'] <= month_start) & 
+                (filtered_df['MAX_Subscription_End_Date'] >= month_start)
+            ]['ACV'].sum()
+            rolling_acv = opening_acv
+            values.append(opening_acv)
 
         # Expiring ACV: Subscriptions expiring in this month
         expiring = filtered_df[
@@ -335,7 +346,7 @@ if start_date and end_date and start_date <= end_date:
         # Renewed ACV: Subscriptions renewed in this month
         renewed = filtered_df[
             (filtered_df['Final_Renewal_Status'] == "Renewed") & 
-            (filtered_df['Renewal_Year'] == start_date.year) & 
+            (filtered_df['Renewal_Year'] == month_start.year) & 
             (filtered_df['Renewal_Month'] == month)
         ]['ACV'].sum()
 
@@ -370,7 +381,7 @@ if start_date and end_date and start_date <= end_date:
     ))
 
     fig.update_layout(
-        title=f"ACV Waterfall: {start_date.strftime('%B %Y')} to {end_date.strftime('%B %Y')}",
+        title=f"ACV Waterfall: {' to '.join([calendar.month_name[m] for m in selected_months])}",
         yaxis_title="ACV (£)",
         showlegend=False
     )
