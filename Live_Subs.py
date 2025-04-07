@@ -402,8 +402,8 @@ if selected_months:
     st.plotly_chart(fig)
 
 
-col1, col2, col3, col4 = st.columns([1.5, 1.5, 1.5, 1.5])
-
+# Create 6 columns, with 1st and 6th as spacers
+spacer1, col1, col2, col3, col4, spacer2 = st.columns([1, 1.5, 1.5, 1.5, 1.5, 1])
 
 with col1:
     st.markdown("<p style='font-size:14px; text-align:center;'>Expiring ACV</p>", unsafe_allow_html=True)
@@ -416,6 +416,3 @@ with col2:
 with col3:
     st.markdown("<p style='font-size:14px; text-align:center;'>New Business ACV</p>", unsafe_allow_html=True)
     st.write(f"**Net Change:** £{(rolling_acv - opening_acv):+,.2f}")
-
-
-    # Show the chart
