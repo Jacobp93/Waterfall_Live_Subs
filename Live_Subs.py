@@ -276,7 +276,6 @@ month_map = {i: pd.to_datetime(f"2024-{i:02d}-01").strftime('%B') for i in range
 month_name_to_num = {v: k for k, v in month_map.items()}
 
 
-
 # Sidebar multi-select for month names
 selected_month_names = st.sidebar.multiselect(
     "Select Month(s)",
