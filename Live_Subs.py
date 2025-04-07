@@ -272,13 +272,6 @@ st.plotly_chart(fig_acv)
 
 # --- Month Selection (Multi-Select Box) ---
 
-
-import pandas as pd
-import calendar
-import plotly.graph_objects as go
-import streamlit as st
-from datetime import timedelta
-
 # Sidebar for month selection
 month_map = {i: calendar.month_name[i] for i in range(1, 13)}  # Map month numbers to month names
 month_name_to_num = {v: k for k, v in month_map.items()}  # Reverse map for easy access
