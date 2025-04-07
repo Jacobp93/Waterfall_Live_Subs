@@ -5,6 +5,7 @@ import plotly.graph_objects as go
 import re
 import datetime
 import calendar
+from datetime import timedelta
 
 
 # Retrieve credentials from Streamlit secrets
