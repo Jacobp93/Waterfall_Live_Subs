@@ -285,6 +285,7 @@ end_month = st.sidebar.selectbox("Select End Month", list(month_map.keys()), ind
 if start_month > end_month:
     st.sidebar.error("Start month should be before end month.")
 else:
+    st.markdown(f"<h2 style='text-align: center;'>ACV Breakdown for {month_map[start_month]} to {month_map[end_month]} {selected_year}</h2>", unsafe_allow_html=True)
 
     # Initialize variables to accumulate totals
     opening_acv = 0
