@@ -392,6 +392,10 @@ if selected_months:
     )
 
 
+    # Show the chart
+    st.plotly_chart(fig)
+
+
 col1, col2, col3, col4 = st.columns([1.5, 1.5, 1.5, 1.5])
 
 # Displaying ACV metrics with custom styling for better fit
@@ -413,6 +417,3 @@ with col4:
 
 
     # Show the chart
-    st.plotly_chart(fig)
-
-
