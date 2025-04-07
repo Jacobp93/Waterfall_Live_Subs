@@ -273,6 +273,11 @@ st.plotly_chart(fig_acv)
 # --- Month Selection (Multi-Select Box) ---
 
 
+import pandas as pd
+import plotly.graph_objects as go
+import streamlit as st
+import calendar
+
 # Define the month mapping
 month_map = {i: pd.to_datetime(f"2024-{i:02d}-01").strftime('%B') for i in range(1, 13)}
 month_name_to_num = {v: k for k, v in month_map.items()}
@@ -299,11 +304,17 @@ if start_month_num > end_month_num:
     st.error("Start Month must be before or the same as End Month.")
 else:
     # Initialize variables for cumulative values
-    cumulative_opening_acv = 0
     cumulative_expiring_acv = 0
     cumulative_renewed_acv = 0
     cumulative_new_business_acv = 0
     cumulative_closing_acv = 0
+
+    # Get the Opening ACV: Subscriptions that were open at the start of the first selected month
+    first_month_start = pd.to_datetime(f"2024-{start_month_num:02d}-01").date()
+    opening_acv = filtered_df[
+        (filtered_df['MIN_Subscription_Start_Date'] <= first_month_start) &
+        (filtered_df['MAX_Subscription_End_Date'] >= first_month_start)
+    ]['ACV'].sum()
 
     # Loop through the months in the selected range (from start month to end month)
     for month_num in range(start_month_num, end_month_num + 1):
@@ -317,36 +328,26 @@ else:
             (filtered_df['MAX_Subscription_End_Date'] <= month_end)
         ]['ACV'].sum()
 
-        # Opening ACV: Subscriptions that were open at the start of the selected month
-        opening_acv = filtered_df[
-            (filtered_df['MIN_Subscription_Start_Date'] <= month_start) &
-            (filtered_df['MAX_Subscription_End_Date'] >= month_start)
-        ]['ACV'].sum()
-
-        # Renewed ACV: Renewals that happened in the selected month
+        # Renewed ACV for the current month
         renewed_acv = filtered_df[
             (filtered_df['Final_Renewal_Status'] == "Renewed") &
             (filtered_df['Renewal_Month'] == month_num)
         ]['ACV'].sum()
 
-        # New Business ACV: New subscriptions that started in the current month
+        # New Business ACV for the current month
         new_business_acv = filtered_df[
             (filtered_df['MIN_Subscription_Start_Date'] >= month_start) &
             (filtered_df['MIN_Subscription_Start_Date'] <= month_end) &
             (filtered_df['deal_pipeline_id'] == "default")
         ]['ACV'].sum()
 
-        # Calculate cumulative closing ACV for the current month
-        closing_acv = opening_acv + renewed_acv + new_business_acv - expiring_acv
-
-        # Accumulate the values
-        cumulative_opening_acv += opening_acv
+        # Calculate cumulative closing ACV for the current month (Expiring + Renewed + New Business)
         cumulative_expiring_acv += expiring_acv
         cumulative_renewed_acv += renewed_acv
         cumulative_new_business_acv += new_business_acv
-        cumulative_closing_acv += closing_acv
+        cumulative_closing_acv = cumulative_expiring_acv + cumulative_renewed_acv + cumulative_new_business_acv
 
-    # Display the cumulative values in a table or text format
+    # Display the opening ACV (static value for the entire period)
     st.markdown(f"<h2 style='text-align: center;'>ACV Breakdown from {start_month} to {end_month}</h2>", unsafe_allow_html=True)
 
     # Displaying the cumulative values
@@ -354,7 +355,7 @@ else:
 
     with col1:
         st.markdown("<p style='font-size:14px; text-align:center;'>Opening ACV</p>", unsafe_allow_html=True)
-        st.write(f"**£{cumulative_opening_acv:,.2f}**")
+        st.write(f"**£{opening_acv:,.2f}**")
 
     with col2:
         st.markdown("<p style='font-size:14px; text-align:center;'>Expiring ACV</p>", unsafe_allow_html=True)
@@ -370,7 +371,7 @@ else:
 
     # Create the Waterfall chart to show accumulated results
     waterfall_data = [
-        {"x": "Opening ACV", "y": cumulative_opening_acv},
+        {"x": "Opening ACV", "y": opening_acv},
         {"x": "Expiring ACV", "y": -cumulative_expiring_acv},
         {"x": "Renewed ACV", "y": cumulative_renewed_acv},
         {"x": "New Business ACV", "y": cumulative_new_business_acv},
