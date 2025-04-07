@@ -403,7 +403,7 @@ if selected_months:
 
 
 # Create 6 columns, with 1st and 6th as spacers
-spacer1, col1, col2, col3, col4, spacer2 = st.columns([3, 2.5, 2.5, 2.5, 2.5, 3])
+spacer1, col1, col2, col3, spacer2 = st.columns([1, 2.5, 2.5, 2.5, 1])
 
 with col1:
     st.markdown("<p style='font-size:14px; text-align:center;'>Expiring ACV</p>", unsafe_allow_html=True)
