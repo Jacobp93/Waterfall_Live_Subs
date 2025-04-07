@@ -292,10 +292,14 @@ fig_acv.update_layout(
 
 st.plotly_chart(fig_acv)
 
-# Title with Selected Year
-
-# User selects year and month
-selected_month = st.sidebar.selectbox("Select Month", range(1, 13), format_func=lambda x: pd.to_datetime(f"{selected_year}-{x:02d}-01").strftime('%B'))
+# User selects month using a slider
+selected_month = st.sidebar.slider(
+    "Select Month",
+    min_value=1,
+    max_value=12,
+    value=1,
+    format="%B"
+)
 
 # Define time period for the selected month
 month_start = pd.to_datetime(f"{selected_year}-{selected_month:02d}-01").date()
