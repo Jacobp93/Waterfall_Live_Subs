@@ -393,3 +393,24 @@ if selected_months:
     st.write(f"**Opening ACV:** £{opening_acv:,.2f}")
     st.write(f"**Closing ACV:** £{rolling_acv:,.2f}")
     st.write(f"**Net Change:** £{(rolling_acv - opening_acv):+,.2f}")
+
+
+
+col1, col2, col3, col4 = st.columns([1.5, 1.5, 1.5, 1.5])
+
+# Displaying ACV metrics with custom styling for better fit
+with col1:
+    st.markdown("<p style='font-size:14px; text-align:center;'>Opening ACV</p>", unsafe_allow_html=True)
+    st.write(f"### Total ACV Movement: {calendar.month_name[first_month]} to {calendar.month_name[last_month]} {selected_year}")
+
+with col2:
+    st.markdown("<p style='font-size:14px; text-align:center;'>Expiring ACV</p>", unsafe_allow_html=True)
+    st.write(f"**Opening ACV:** £{opening_acv:,.2f}")
+
+with col3:
+    st.markdown("<p style='font-size:14px; text-align:center;'>Renewed ACV</p>", unsafe_allow_html=True)
+    st.write(f"**Closing ACV:** £{rolling_acv:,.2f}")
+
+with col4:
+    st.markdown("<p style='font-size:14px; text-align:center;'>New Business ACV</p>", unsafe_allow_html=True)
+    st.write(f"**Net Change:** £{(rolling_acv - opening_acv):+,.2f}")
