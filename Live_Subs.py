@@ -353,7 +353,7 @@ else:
 
     # Prepare values for the chart (5 bars)
     labels = ["Opening ACV", "Expiring ACV", "Renewed ACV", "New Business ACV", "Closing ACV"]
-    values = [opening_acv, expiring_acv, renewed_acv, new_business_acv, closing_acv]
+    values = [opening_acv, -expiring_acv, renewed_acv, new_business_acv, closing_acv]
     
     # Create the Waterfall chart
     fig = go.Figure(go.Waterfall(
