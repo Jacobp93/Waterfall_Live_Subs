@@ -243,31 +243,6 @@ closing_acv = opening_acv + renewed_acv + new_business_acv - expiring_acv
 # Title with Selected Year
 st.markdown(f"<h2 style='text-align: center;'>ACV Breakdown for {selected_year}</h2>", unsafe_allow_html=True)
 
-# Define wider column proportions to fit values properly
-col1, col2, col3, col4, col5 = st.columns([1.5, 1.5, 1.5, 1.5, 1.5])
-
-# Displaying ACV metrics with custom styling for better fit
-with col1:
-    st.markdown("<p style='font-size:14px; text-align:center;'>Opening ACV</p>", unsafe_allow_html=True)
-    st.write(f"**£{opening_acv:,.2f}**")
-
-with col2:
-    st.markdown("<p style='font-size:14px; text-align:center;'>Expiring ACV</p>", unsafe_allow_html=True)
-    st.write(f"**£{expiring_acv:,.2f}**")
-
-with col3:
-    st.markdown("<p style='font-size:14px; text-align:center;'>Renewed ACV</p>", unsafe_allow_html=True)
-    st.write(f"**£{renewed_acv:,.2f}**")
-
-with col4:
-    st.markdown("<p style='font-size:14px; text-align:center;'>New Business ACV</p>", unsafe_allow_html=True)
-    st.write(f"**£{new_business_acv:,.2f}**")
-
-with col5:
-    st.markdown("<p style='font-size:14px; text-align:center;'>Closing ACV</p>", unsafe_allow_html=True)
-    st.write(f"**£{closing_acv:,.2f}**")
-
-
 # Waterfall Chart for ACV Breakdown
 waterfall_data = [
     {"x": "Opening ACV", "y": opening_acv},
@@ -297,6 +272,30 @@ st.plotly_chart(fig_acv)
 # --- Month Selection (Multi-Select Box) ---
 
 
+
+# Define wider column proportions to fit values properly
+col1, col2, col3, col4, col5 = st.columns([1.5, 1.5, 1.5, 1.5, 1.5])
+
+# Displaying ACV metrics with custom styling for better fit
+with col1:
+    st.markdown("<p style='font-size:14px; text-align:center;'>Opening ACV</p>", unsafe_allow_html=True)
+    st.write(f"**£{opening_acv:,.2f}**")
+
+with col2:
+    st.markdown("<p style='font-size:14px; text-align:center;'>Expiring ACV</p>", unsafe_allow_html=True)
+    st.write(f"**£{expiring_acv:,.2f}**")
+
+with col3:
+    st.markdown("<p style='font-size:14px; text-align:center;'>Renewed ACV</p>", unsafe_allow_html=True)
+    st.write(f"**£{renewed_acv:,.2f}**")
+
+with col4:
+    st.markdown("<p style='font-size:14px; text-align:center;'>New Business ACV</p>", unsafe_allow_html=True)
+    st.write(f"**£{new_business_acv:,.2f}**")
+
+with col5:
+    st.markdown("<p style='font-size:14px; text-align:center;'>Closing ACV</p>", unsafe_allow_html=True)
+    st.write(f"**£{closing_acv:,.2f}**")
 
 
 
