@@ -275,77 +275,112 @@ st.plotly_chart(fig_acv)
 month_map = {i: pd.to_datetime(f"2024-{i:02d}-01").strftime('%B') for i in range(1, 13)}
 month_name_to_num = {v: k for k, v in month_map.items()}
 
-# Sidebar dropdown for selecting start and end months
-start_month = st.sidebar.selectbox(
-    "Select Start Month",
+
+
+# Sidebar multi-select for month names
+selected_month_names = st.sidebar.multiselect(
+    "Select Month(s)",
     list(month_name_to_num.keys()),
-    index=0,  # default to January
+    default=["January"]
 )
 
-end_month = st.sidebar.selectbox(
-    "Select End Month",
-    list(month_name_to_num.keys()),
-    index=5,  # default to June
-)
+# Convert month names to numbers for calculation
+selected_months = sorted([month_name_to_num[name] for name in selected_month_names])
 
-# Convert selected month names to numbers
-start_month_num = month_name_to_num[start_month]
-end_month_num = month_name_to_num[end_month]
+if selected_months:
+    # Establish start and end dates of the total range
+    first_month = selected_months[0]
+    last_month = selected_months[-1]
+    first_month_start = pd.to_datetime(f"{selected_year}-{first_month:02d}-01").date()
+    last_month_end = (pd.to_datetime(f"{selected_year}-{last_month:02d}-01") + pd.offsets.MonthEnd(0)).date()
 
-# Ensure start month is before end month
-if start_month_num > end_month_num:
-    st.error("Start Month must be before or the same as End Month.")
-else:
-    # Initialize variables for cumulative values
-    cumulative_expiring_acv = 0
-    cumulative_renewed_acv = 0
-    cumulative_new_business_acv = 0
-    cumulative_closing_acv = 0
+    st.markdown(f"<h2 style='text-align: center;'>ACV Breakdown for {', '.join(selected_month_names)} {selected_year}</h2>", unsafe_allow_html=True)
 
-    # Get the Opening ACV: Subscriptions that were open at the start of the first selected month
-    first_month_start = pd.to_datetime(f"2024-{start_month_num:02d}-01").date()
+    # Calculate Opening ACV at the start of the first selected month
     opening_acv = filtered_df[
         (filtered_df['MIN_Subscription_Start_Date'] <= first_month_start) &
         (filtered_df['MAX_Subscription_End_Date'] >= first_month_start)
     ]['ACV'].sum()
 
-    # Loop through the months in the selected range (from start month to end month)
-    for month_num in range(start_month_num, end_month_num + 1):
-        # Calculate the first and last date of the current month
-        month_start = pd.to_datetime(f"2024-{month_num:02d}-01").date()
+    # Initialize rolling values
+    rolling_acv = opening_acv
+    cumulative_expiring_acv = 0
+    cumulative_renewed_acv = 0
+    cumulative_new_business_acv = 0
+
+    # Define labels and values for the waterfall chart
+    labels = ["Opening ACV"]
+    values = [opening_acv]
+
+    # Loop through the selected months
+    for month in selected_months:
+        month_start = pd.to_datetime(f"{selected_year}-{month:02d}-01").date()
         month_end = (pd.to_datetime(month_start) + pd.offsets.MonthEnd(0)).date()
 
-        # Expiring ACV for the current month
+        # Add one day to month_end for calculating expiring subscriptions correctly
+        next_month_end = month_end + timedelta(days=1)
+
+        # Expiring ACV for the current month (subscriptions ending between month_end and next_month_end)
         expiring_acv = filtered_df[
-            (filtered_df['Renewal_Year'] == 2024) &  # Assuming we're working within 2024 for example
-            (filtered_df['Renewal_Month'] == month_num)  # Filter for the correct month
+            (filtered_df['Renewal_Year'] == selected_year) &
+            (filtered_df['Renewal_Month'] == month)
         ]['ACV'].sum()
 
         # Renewed ACV for the current month
         renewed_acv = filtered_df[
             (filtered_df['Final_Renewal_Status'] == "Renewed") &
-            (filtered_df['Renewal_Year'] == 2024) &  # Assuming we want the year to be 2024
-            (filtered_df['Renewal_Month'] == month_num)  # Filter for the correct month
+            (filtered_df['Renewal_Year'] == selected_year) &
+            (filtered_df['Renewal_Month'] == month)
         ]['ACV'].sum()
 
-        # New Business ACV for the current month
+        # New Business ACV for the current month (new subscriptions starting within the current month)
         new_business_acv = filtered_df[
             (filtered_df['MIN_Subscription_Start_Date'] >= month_start) &
             (filtered_df['MIN_Subscription_Start_Date'] <= month_end) &
             (filtered_df['deal_pipeline_id'] == "default")
         ]['ACV'].sum()
 
-        # Calculate cumulative closing ACV for the current month (Expiring + Renewed + New Business)
+        # Update cumulative values
         cumulative_expiring_acv += expiring_acv
         cumulative_renewed_acv += renewed_acv
         cumulative_new_business_acv += new_business_acv
-        cumulative_closing_acv = cumulative_expiring_acv + cumulative_renewed_acv + cumulative_new_business_acv
 
-    # Display the opening ACV (static value for the entire period)
-    st.markdown(f"<h2 style='text-align: center;'>ACV Breakdown from {start_month} to {end_month}</h2>", unsafe_allow_html=True)
+        # Update rolling ACV: Add Renewed and New Business ACV, subtract Expiring ACV
+        rolling_acv = rolling_acv - expiring_acv + renewed_acv + new_business_acv
 
-    # Displaying the cumulative values
-    col1, col2, col3, col4 = st.columns([1.5, 1.5, 1.5, 1.5])
+        # Append each month’s details to the chart series
+        values.extend([-expiring_acv, renewed_acv, new_business_acv])
+        labels.extend([
+            f"{calendar.month_abbr[month]} Expiring",
+            f"{calendar.month_abbr[month]} Renewed",
+            f"{calendar.month_abbr[month]} New"
+        ])
+
+    # Append closing ACV
+    labels.append("Closing ACV")
+    values.append(rolling_acv)
+
+    # Create the Waterfall Chart
+    fig = go.Figure(go.Waterfall(
+        x=labels,
+        y=values,
+        text=[f"£{v:,.2f}" for v in values],
+        decreasing={"marker": {"color": "red"}},
+        increasing={"marker": {"color": "green"}},
+        connector={"line": {"color": "gray"}}
+    ))
+
+    fig.update_layout(
+        title=f"ACV Waterfall: {' to '.join([calendar.month_name[m] for m in selected_months])} {selected_year}",
+        yaxis_title="ACV (£)",
+        showlegend=False
+    )
+
+    # Show the chart
+    st.plotly_chart(fig)
+
+    # Display the ACV metrics
+    col1, col2, col3, col4, col5 = st.columns([1.5, 1.5, 1.5, 1.5, 1.5])
 
     with col1:
         st.markdown("<p style='font-size:14px; text-align:center;'>Opening ACV</p>", unsafe_allow_html=True)
@@ -363,29 +398,9 @@ else:
         st.markdown("<p style='font-size:14px; text-align:center;'>New Business ACV</p>", unsafe_allow_html=True)
         st.write(f"**£{cumulative_new_business_acv:,.2f}**")
 
-    # Create the Waterfall chart to show accumulated results
-    waterfall_data = [
-        {"x": "Opening ACV", "y": opening_acv},
-        {"x": "Expiring ACV", "y": -cumulative_expiring_acv},
-        {"x": "Renewed ACV", "y": cumulative_renewed_acv},
-        {"x": "New Business ACV", "y": cumulative_new_business_acv},
-        {"x": "Closing ACV", "y": cumulative_closing_acv}
-    ]
+    with col5:
+        st.markdown("<p style='font-size:14px; text-align:center;'>Closing ACV</p>", unsafe_allow_html=True)
+        st.write(f"**£{rolling_acv:,.2f}**")
 
-    fig_acv = go.Figure(go.Waterfall(
-        x=[item["x"] for item in waterfall_data],
-        y=[item["y"] for item in waterfall_data],
-        text=[f"£{abs(value):,.2f}" for value in [item["y"] for item in waterfall_data]],
-        decreasing={"marker": {"color": "red"}},
-        increasing={"marker": {"color": "green"}}
-    ))
-
-    fig_acv.update_layout(
-        title=f"Cumulative ACV Breakdown from {start_month} to {end_month}",
-        xaxis_title="ACV Breakdown",
-        yaxis_title="Amount (£)",
-        showlegend=False
-    )
-
-    # Show the chart
-    st.plotly_chart(fig_acv)
+else:
+    st.error("Please select at least one month.")
