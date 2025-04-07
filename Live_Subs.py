@@ -287,10 +287,6 @@ if start_month > end_month:
 else:
     st.markdown(f"<h2 style='text-align: center;'>ACV Breakdown for {month_map[start_month]} to {month_map[end_month]} {selected_year}</h2>", unsafe_allow_html=True)
 
-    
-    # Display the date range
-    st.markdown(f"<h2 style='text-align: center;'>ACV Breakdown for {month_map[start_month]} to {month_map[end_month]} {selected_year}</h2>", unsafe_allow_html=True)
-
     # Initialize variables to accumulate totals
     opening_acv = 0
     expiring_acv = 0
