@@ -300,12 +300,6 @@ st.plotly_chart(fig_acv)
 month_map = {i: pd.to_datetime(f"2024-{i:02d}-01").strftime('%B') for i in range(1, 13)}
 month_name_to_num = {v: k for k, v in month_map.items()}
 
-# Multi-select months by name
-selected_month_names = st.sidebar.multiselect(
-    "Select Month(s)",
-    options=list(month_map.values()),
-    default=["January"]
-)
 
 # Sidebar multi-select for month names
 selected_month_names = st.sidebar.multiselect(
