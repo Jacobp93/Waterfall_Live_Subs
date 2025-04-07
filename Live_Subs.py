@@ -363,25 +363,3 @@ else:
     # Show the chart
     st.plotly_chart(fig)
 
-    # Display accumulated values in a table format
-    col1, col2, col3, col4, col5 = st.columns([1.5, 1.5, 1.5, 1.5, 1.5])
-
-    with col1:
-        st.markdown("<p style='font-size:14px; text-align:center;'>Opening ACV</p>", unsafe_allow_html=True)
-        st.write(f"**£{opening_acv:,.2f}**")
-
-    with col2:
-        st.markdown("<p style='font-size:14px; text-align:center;'>Expiring ACV</p>", unsafe_allow_html=True)
-        st.write(f"**£{expiring_acv:,.2f}**")
-
-    with col3:
-        st.markdown("<p style='font-size:14px; text-align:center;'>Renewed ACV</p>", unsafe_allow_html=True)
-        st.write(f"**£{renewed_acv:,.2f}**")
-
-    with col4:
-        st.markdown("<p style='font-size:14px; text-align:center;'>New Business ACV</p>", unsafe_allow_html=True)
-        st.write(f"**£{new_business_acv:,.2f}**")
-
-    with col5:
-        st.markdown("<p style='font-size:14px; text-align:center;'>Closing ACV</p>", unsafe_allow_html=True)
-        st.write(f"**£{closing_acv:,.2f}**")
