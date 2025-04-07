@@ -294,7 +294,7 @@ else:
     new_business_acv = 0
     closing_acv = 0
     
-    # Calculate Opening ACV at the start of the first selected month
+    # Calculate Opening ACV at the start of the first selected months
     first_month_start = pd.to_datetime(f"{selected_year}-{start_month:02d}-01").date()
     opening_acv = filtered_df[
         (filtered_df['MIN_Subscription_Start_Date'] <= first_month_start) & 
