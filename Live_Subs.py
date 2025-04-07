@@ -296,6 +296,12 @@ st.plotly_chart(fig_acv)
 
 # --- Month Selection (Multi-Select Box) ---
 
+
+
+
+
+
+
 # Map month numbers to month names and reverse
 month_map = {i: pd.to_datetime(f"2024-{i:02d}-01").strftime('%B') for i in range(1, 13)}
 month_name_to_num = {v: k for k, v in month_map.items()}
@@ -385,16 +391,6 @@ if selected_months:
         showlegend=False
     )
 
-    # Show the chart
-    st.plotly_chart(fig)
-
-    # Show summary
-    st.write(f"### Total ACV Movement: {calendar.month_name[first_month]} to {calendar.month_name[last_month]} {selected_year}")
-    st.write(f"**Opening ACV:** £{opening_acv:,.2f}")
-    st.write(f"**Closing ACV:** £{rolling_acv:,.2f}")
-    st.write(f"**Net Change:** £{(rolling_acv - opening_acv):+,.2f}")
-
-
 
 col1, col2, col3, col4 = st.columns([1.5, 1.5, 1.5, 1.5])
 
@@ -414,3 +410,9 @@ with col3:
 with col4:
     st.markdown("<p style='font-size:14px; text-align:center;'>New Business ACV</p>", unsafe_allow_html=True)
     st.write(f"**Net Change:** £{(rolling_acv - opening_acv):+,.2f}")
+
+
+    # Show the chart
+    st.plotly_chart(fig)
+
+
