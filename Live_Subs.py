@@ -274,6 +274,8 @@ st.plotly_chart(fig_acv)
 
 
 
+# --- Month Selection (Multi-Select Box) ---
+
 # Define wider column proportions to fit values properly
 col1, col2, col3, col4, col5 = st.columns([1.5, 1.5, 1.5, 1.5, 1.5])
 
@@ -298,23 +300,15 @@ with col5:
     st.markdown("<p style='font-size:14px; text-align:center;'>Closing ACV</p>", unsafe_allow_html=True)
     st.write(f"**£{closing_acv:,.2f}**")
 
-
-
-
 # Map month numbers to month names and reverse
 month_map = {i: pd.to_datetime(f"2024-{i:02d}-01").strftime('%B') for i in range(1, 13)}
 month_name_to_num = {v: k for k, v in month_map.items()}
-
 
 # Sidebar multi-select for month names
 selected_month_names = st.sidebar.multiselect(
     "Select Month(s)", list(month_name_to_num.keys()),
     default=["January"],
 )
-
-
-
-
 
 # Convert to sorted month numbers
 selected_months = sorted([month_name_to_num[name] for name in selected_month_names])
@@ -326,9 +320,7 @@ if selected_months:
     first_month_start = pd.to_datetime(f"{selected_year}-{first_month:02d}-01").date()
     last_month_end = (pd.to_datetime(f"{selected_year}-{last_month:02d}-01") + pd.offsets.MonthEnd(0)).date()
 
-
-    st.markdown(f"<h2 style='text-align: center;'>ACV Breakdown for {selected_month_names}</h2>", unsafe_allow_html=True)
-
+    st.markdown(f"<h2 style='text-align: center;'>ACV Breakdown for {', '.join(selected_month_names)}</h2>", unsafe_allow_html=True)
 
     # Calculate opening ACV at start of first selected month
     opening_acv = filtered_df[
@@ -347,23 +339,23 @@ if selected_months:
         month_start = pd.to_datetime(f"{selected_year}-{month:02d}-01").date()
         month_end = (pd.to_datetime(month_start) + pd.offsets.MonthEnd(0)).date()
 
-   # Add one day to month_end so that subscriptions expiring on the last day of the month are considered expired in the following month
+        # Add one day to month_end so that subscriptions expiring on the last day of the month are considered expired in the following month
         next_month_end = month_end + timedelta(days=1)
 
-    # Expiring ACV: Check if the subscription ends between the current month end and next month end
+        # Expiring ACV: Check if the subscription ends between the current month end and next month end
         expiring = filtered_df[
-        (filtered_df['Renewal_Year'] == selected_year) &
-        (filtered_df['Renewal_Month'] == month)
+            (filtered_df['Renewal_Year'] == selected_year) &
+            (filtered_df['Renewal_Month'] == month)
         ]['ACV'].sum()
 
-        # Renewed
+        # Renewed ACV: Check for renewals in the current month
         renewed = filtered_df[
             (filtered_df['Final_Renewal_Status'] == "Renewed") &
             (filtered_df['Renewal_Year'] == selected_year) &
             (filtered_df['Renewal_Month'] == month)
         ]['ACV'].sum()
 
-        # New Business
+        # New Business ACV: Check if the business is new within the month
         new_business = filtered_df[
             (filtered_df['MIN_Subscription_Start_Date'] >= month_start) &
             (filtered_df['MIN_Subscription_Start_Date'] <= month_end) &
@@ -401,10 +393,8 @@ if selected_months:
         showlegend=False
     )
 
-
     # Show the chart
     st.plotly_chart(fig)
-
 
 # Create 6 columns, with 1st and 6th as spacers
 spacer1, col1, col2, col3, spacer2 = st.columns([2, 2.5, 2.5, 2.5, 2])
