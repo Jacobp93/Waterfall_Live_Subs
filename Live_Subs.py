@@ -306,25 +306,23 @@ selected_month_names = st.sidebar.multiselect(
     default=["January"]
 )
 
-# Convert selected month names back to numbers
-selected_months = [month_name_to_num[name] for name in selected_month_names]
+# --- Sort selected months in ascending order ---
+selected_months = sorted([month_name_to_num[name] for name in selected_month_names])
 
-# --- Monthly ACV Breakdown Section ---
+# Start with the first month's opening ACV
+if selected_months:
+    rolling_opening_acv = filtered_df[
+        (filtered_df['MIN_Subscription_Start_Date'] <= pd.to_datetime(f"{selected_year}-{selected_months[0]:02d}-01").date()) &
+        (filtered_df['MAX_Subscription_End_Date'] >= pd.to_datetime(f"{selected_year}-{selected_months[0]:02d}-01").date())
+    ]['ACV'].sum()
 
-# Check at least one month is selected
-if not selected_months:
-    st.warning("Please select at least one month to view the ACV breakdown.")
-else:
     for month in selected_months:
         # Define time period for the month
         month_start = pd.to_datetime(f"{selected_year}-{month:02d}-01").date()
         month_end = (pd.to_datetime(month_start) + pd.offsets.MonthEnd(0)).date()
 
-        # Opening ACV
-        opening_acv = filtered_df[
-            (filtered_df['MIN_Subscription_Start_Date'] <= month_start) &
-            (filtered_df['MAX_Subscription_End_Date'] >= month_start)
-        ]['ACV'].sum()
+        # Use rolling_opening_acv as this month's opening
+        opening_acv = rolling_opening_acv
 
         # Expiring ACV
         expiring_acv = filtered_df[
@@ -346,8 +344,11 @@ else:
             (filtered_df['deal_pipeline_id'] == "default")
         ]['ACV'].sum()
 
-        # Closing ACV
+        # Closing ACV = Rolling logic
         closing_acv = opening_acv - expiring_acv + renewed_acv + new_business_acv
+
+        # Update rolling for next month
+        rolling_opening_acv = closing_acv
 
         # --- Waterfall Chart for This Month ---
         waterfall_values = [opening_acv, -expiring_acv, renewed_acv, new_business_acv, closing_acv]
