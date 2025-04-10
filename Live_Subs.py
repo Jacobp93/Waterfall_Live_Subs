@@ -293,7 +293,6 @@ else:
     expiring_acv = 0
     renewed_acv = 0
     new_business_acv = 0
-    closing_acv = 0
     
     # Calculate Opening ACV at the start of the first selected months
     first_month_start = pd.to_datetime(f"{selected_year}-{start_month:02d}-01").date()
