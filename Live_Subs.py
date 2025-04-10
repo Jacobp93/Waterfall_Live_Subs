@@ -293,6 +293,7 @@ else:
     expiring_acv = 0
     renewed_acv = 0
     new_business_acv = 0
+    closing_acv = 0
     
     # Calculate Opening ACV at the start of the first selected months
     first_month_start = pd.to_datetime(f"{selected_year}-{start_month:02d}-01").date()
@@ -339,7 +340,7 @@ else:
         new_business_acv += new_business
         
         # Update the rolling ACV (Closing ACV for the month)
-        rolling_acv = rolling_acv - expiring_acv + renewed + new_business
+        rolling_acv = rolling_acv - expiring + renewed + new_business
 
     # Prepare values for the chart (5 bars)
     labels = ["Opening ACV", "Expiring ACV", "Renewed ACV", "New Business ACV", "Closing ACV"]
