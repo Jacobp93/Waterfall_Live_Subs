@@ -327,10 +327,10 @@ else:
         new_business = filtered_df[
             (filtered_df['MIN_Subscription_Start_Date'] >= month_start) &
             (filtered_df['MIN_Subscription_Start_Date'] <= month_end) &
-            (filtered_df['deal_pipeline_id'] == "default")  # Assuming this identifies new business
+            (filtered_df['deal_pipeline_id'] == "default")  
         ]['ACV'].sum()
 
-        closing_acv = opening_acv - expiring_acv + renewed_acv + new_business_acv
+        closing_acv = opening_acv - expiring + renewed_acv + new_business_acv
 
 
 
