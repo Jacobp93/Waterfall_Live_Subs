@@ -13,8 +13,7 @@ sql_server = st.secrets["sql"]["SQL_SERVER"]
 sql_database_1 = st.secrets["sql"]["SQL_DATABASE_1"]
 sql_uid = st.secrets["sql"]["SQL_UID"]
 sql_pass = st.secrets["sql"]["SQL_PASS"]
-sql_driver = "ODBC Driver 17 for SQL Server"  # Update as necessary
-
+sql_driver = "ODBC Driver 17 for SQL Server" 
 
 
 
@@ -229,8 +228,10 @@ if selected_region != "All":
 opening_acv = filtered_df[(filtered_df['MIN_Subscription_Start_Date'] <= start_date) & 
                           (filtered_df['MAX_Subscription_End_Date'] >= start_date)]['ACV'].sum()
 
-expiring_acv = filtered_df[(filtered_df['MAX_Subscription_End_Date'] >= start_date) & 
-                           (filtered_df['MAX_Subscription_End_Date'] <= end_date)]['ACV'].sum()
+ # Expiring ACV (Anything expiring in the current month)
+expiring_acv = filtered_df[
+            (filtered_df['Renewal_Year'] == selected_year)
+        ]['ACV'].sum()
 
 renewed_acv = filtered_df[(filtered_df['Final_Renewal_Status'] == "Renewed") & 
                           (filtered_df['Renewal_Year'] == selected_year)]['ACV'].sum()
@@ -361,6 +362,6 @@ else:
         showlegend=False
     )
 
-    # Show the chart
+    
     st.plotly_chart(fig)
 
