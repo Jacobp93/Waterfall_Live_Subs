@@ -195,11 +195,11 @@ df = load_data_from_sql(sql_query)
 # Convert date columns
 df['MIN_Subscription_Start_Date'] = pd.to_datetime(df['MIN_Subscription_Start_Date'], errors='coerce').dt.date
 df['MAX_Subscription_End_Date'] = pd.to_datetime(df['MAX_Subscription_End_Date'], errors='coerce').dt.date
-df['Renewal_Period_Date'] = pd.to_datetime(df['Renewal_Period_Date'], errors='coerce')
+df['Renewal_Period'] = pd.to_datetime(df['Renewal_Period'], errors='coerce')
 
 # Extract Year and Month from Renewal_Period_Date
-df['Renewal_Month'] = df['Renewal_Period_Date'].dt.month.fillna(0).astype(int)
-df['Renewal_Year'] = df['Renewal_Period_Date'].dt.year.fillna(0).astype(int)
+df['Renewal_Month'] = df['Renewal_Period'].dt.month.fillna(0).astype(int)
+df['Renewal_Year'] = df['Renewal_Period'].dt.year.fillna(0).astype(int)
 
 # Sidebar Filters
 st.sidebar.header("Filters")
