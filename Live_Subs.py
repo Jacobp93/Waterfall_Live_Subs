@@ -65,15 +65,15 @@ WITH SubscriptionData AS (
         deal.deal_pipeline_id,
         company.id AS Company_ID, 
         company.property_name,
-		company.property_region_dfe_,
+        company.property_region_dfe_,
         deal.deal_pipeline_stage_id,
         aggregated.property_bundle,
-        aggregated.property_product_category, -- Track Product Category for Renewal Logic
+        aggregated.property_product_category,
         MIN(line_item.property_subscription_start_date) AS MIN_Subscription_Start_Date,
         MAX(line_item.property_subscription_end_date) AS MAX_Subscription_End_Date,
         aggregated.Total_Amount,
 
-        -- Subscription Status: LIVE or EXPIRED
+        -- Subscription Status
         CASE 
             WHEN MAX(line_item.property_subscription_end_date) >= GETDATE() THEN 'LIVE' 
             ELSE 'EXPIRED' 
@@ -82,11 +82,8 @@ WITH SubscriptionData AS (
         -- Begin Period (Start Date)
         FORMAT(MIN(line_item.property_subscription_start_date), 'yyyy-MM-dd') AS Begin_Period_Date,
 
-        -- Renewal Period (End Date)
-FORMAT(
-    DATEADD(DAY, 1, MAX(line_item.property_subscription_end_date)), 
-    'yyyy-MM'
-) AS Renewal_Period_Date,
+        -- Renewal Period (End Date + 1 day, formatted to month)
+        FORMAT(DATEADD(DAY, 1, MAX(line_item.property_subscription_end_date)), 'yyyy-MM') AS Renewal_Period,
 
         -- ACV Calculation (Annual Contract Value)
         ROUND(
@@ -99,7 +96,7 @@ FORMAT(
         [_hubspot].[deal] AS deal
     LEFT JOIN 
         (
-            -- Subquery to aggregate total amount
+            -- Aggregate total amount and calculate min/max dates per product
             SELECT 
                 line_item_deal.deal_id,
                 product.property_bundle,
@@ -136,13 +133,14 @@ FORMAT(
         ON line_item_deal.line_item_id = line_item.id
     WHERE 
         pipeline_labels.label IN ('Closed won', 'Closed Won Approved', 'Renewal due', 'Cancelled Subscription') 
-        AND deal.deal_pipeline_id IN ('default', '1305376', '1313057', '2453638', '6617404', '17494655', '1305377')  
+        AND deal.deal_pipeline_id IN ('default', '1305376', '1313057', '2453638', '6617404', '17494655', '1305377')   
+        AND company.property_name = 'Askern Moss Road Infant Academy'
     GROUP BY 
         deal.Deal_id,
         deal.deal_pipeline_id,
         company.id,
         company.property_name,
-		company.property_region_dfe_,
+        company.property_region_dfe_,
         deal.deal_pipeline_stage_id,
         aggregated.property_bundle,
         aggregated.property_product_category,
@@ -152,16 +150,18 @@ RenewalCheck AS (
     SELECT 
         sd1.*,
 
-        -- Check if the same Company and Product Category have a new deal starting after expiration
+        -- Renewal logic with 12-month future window and backdating to original start
         CASE 
+            WHEN sd1.Subscription_Status = 'LIVE' THEN 'Due for Renewal'
             WHEN EXISTS (
                 SELECT 1 
                 FROM SubscriptionData sd2 
-                WHERE sd1.Company_ID = sd2.Company_ID 
-                AND sd1.property_product_category = sd2.property_product_category
-                AND YEAR(sd1.MAX_Subscription_End_Date) = YEAR(sd2.MIN_Subscription_Start_Date)
-            ) 
-            THEN 'Renewed'
+                WHERE 
+                    sd1.Company_ID = sd2.Company_ID 
+                    AND sd1.property_product_category = sd2.property_product_category
+                    AND sd2.Deal_id <> sd1.Deal_id
+                    AND sd2.MIN_Subscription_Start_Date BETWEEN sd1.MIN_Subscription_Start_Date AND DATEADD(YEAR, 1, sd1.MAX_Subscription_End_Date)
+            ) THEN 'Renewed'
             ELSE 'Not Renewed'
         END AS Renewal_Status
 
@@ -170,19 +170,16 @@ RenewalCheck AS (
 FinalStatus AS (
     SELECT 
         rc.*,
-
-        -- Adjusted Renewal Status Logic
         CASE 
             WHEN rc.Subscription_Status = 'LIVE' AND rc.Renewal_Status = 'Not Renewed' THEN 'Due for Renewal'
             WHEN rc.Subscription_Status = 'EXPIRED' AND rc.Renewal_Status = 'Not Renewed' THEN 'Non Renewal'
             ELSE rc.Renewal_Status
         END AS Final_Renewal_Status
-
     FROM RenewalCheck rc
 )
-SELECT * FROM FinalStatus
+SELECT * 
+FROM FinalStatus
 ORDER BY property_name, MAX_Subscription_End_Date DESC;
-----------------------------------------------------------------
 
 """
 
