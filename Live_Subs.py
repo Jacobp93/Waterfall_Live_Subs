@@ -134,7 +134,6 @@ WITH SubscriptionData AS (
     WHERE 
         pipeline_labels.label IN ('Closed won', 'Closed Won Approved', 'Renewal due', 'Cancelled Subscription') 
         AND deal.deal_pipeline_id IN ('default', '1305376', '1313057', '2453638', '6617404', '17494655', '1305377')   
-        AND company.property_name = 'Askern Moss Road Infant Academy'
     GROUP BY 
         deal.Deal_id,
         deal.deal_pipeline_id,
