@@ -274,9 +274,8 @@ st.plotly_chart(fig_acv)
 # Define month names for selection
 month_map = {i: pd.to_datetime(f"2024-{i:02d}-01").strftime('%B') for i in range(1, 13)}
 
-# Sidebar for selecting start and end months
-start_month = st.sidebar.selectbox("Select Start Month", list(month_map.keys()), index=0)
-end_month = st.sidebar.selectbox("Select End Month", list(month_map.keys()), index=11)
+start_month = st.sidebar.selectbox("Select Start Month", list(month_map.keys()), index=0, key="start_month_selector")
+end_month = st.sidebar.selectbox("Select End Month", list(month_map.keys()), index=11, key="end_month_selector")
 
 # Ensure start month is before end month
 if start_month > end_month:
