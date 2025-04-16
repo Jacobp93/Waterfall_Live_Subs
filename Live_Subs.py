@@ -367,7 +367,7 @@ else:
 
     # Data for the simplified chart
     simple_labels = ["Opening ACV", "Expiring ACV", "New Business" "Closing ACV"]
-    simple_values = [opening_acv, -expiring_acv, ,new_business_acv , closing_acv]
+    simple_values = [opening_acv, -expiring_acv,new_business_acv , closing_acv]
 
     fig_simple = go.Figure(go.Waterfall(
         x=simple_labels,
