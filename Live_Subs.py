@@ -59,7 +59,7 @@ def load_data_from_sql(query):
 # SQL Query to extract subscription data
 sql_query = """
 	------------------------------------------------------------------------------------------------
-WITH SubscriptionData AS (
+WITH SubscriptionDataRaw AS (
     SELECT 
         deal.Deal_id,
         deal.deal_pipeline_id,
@@ -69,39 +69,47 @@ WITH SubscriptionData AS (
         deal.deal_pipeline_stage_id,
         aggregated.property_bundle,
         aggregated.property_product_category,
-        MIN(line_item.property_subscription_start_date) AS MIN_Subscription_Start_Date,
-        MAX(line_item.property_subscription_end_date) AS MAX_Subscription_End_Date,
+        aggregated.MIN_Subscription_Start_Date,
+        aggregated.MAX_Subscription_End_Date,
         aggregated.Total_Amount,
 
         -- Subscription Status
         CASE 
-            WHEN MAX(line_item.property_subscription_end_date) >= GETDATE() THEN 'LIVE' 
+            WHEN aggregated.MAX_Subscription_End_Date >= GETDATE() THEN 'LIVE' 
             ELSE 'EXPIRED' 
         END AS Subscription_Status,
 
         -- Begin Period (Start Date)
-        FORMAT(MIN(line_item.property_subscription_start_date), 'yyyy-MM-dd') AS Begin_Period_Date,
+        FORMAT(aggregated.MIN_Subscription_Start_Date, 'yyyy-MM-dd') AS Begin_Period_Date,
 
         -- Renewal Period (End Date + 1 day, formatted to month)
-        FORMAT(DATEADD(DAY, 1, MAX(line_item.property_subscription_end_date)), 'yyyy-MM') AS Renewal_Period,
+        FORMAT(DATEADD(DAY, 1, aggregated.MAX_Subscription_End_Date), 'yyyy-MM') AS Renewal_Period,
 
         -- ACV Calculation (Annual Contract Value)
         ROUND(
             (aggregated.Total_Amount / 
-            NULLIF(DATEDIFF(DAY, MIN(line_item.property_subscription_start_date), MAX(line_item.property_subscription_end_date)) + 1, 0))
+            NULLIF(DATEDIFF(DAY, aggregated.MIN_Subscription_Start_Date, aggregated.MAX_Subscription_End_Date) + 1, 0))
             * 365, 2
-        ) AS ACV
+        ) AS ACV,
+
+        ROW_NUMBER() OVER (
+            PARTITION BY deal.Deal_id, company.id, aggregated.property_product_category
+            ORDER BY aggregated.MAX_Subscription_End_Date DESC
+        ) AS rn
 
     FROM 
         [_hubspot].[deal] AS deal
+
     LEFT JOIN 
         (
-            -- Aggregate total amount and calculate min/max dates per product
+            -- Aggregate per deal + product category
             SELECT 
                 line_item_deal.deal_id,
                 product.property_bundle,
                 product.property_product_category,
-                SUM(line_item.property_amount) AS Total_Amount
+                SUM(line_item.property_amount) AS Total_Amount,
+                MIN(line_item.property_subscription_start_date) AS MIN_Subscription_Start_Date,
+                MAX(line_item.property_subscription_end_date) AS MAX_Subscription_End_Date
             FROM 
                 [_hubspot].[line_item_deal] AS line_item_deal
             INNER JOIN 
@@ -116,34 +124,27 @@ WITH SubscriptionData AS (
                 product.property_product_category
         ) AS aggregated
         ON deal.Deal_id = aggregated.deal_id
+
     LEFT JOIN 
         [_hubspot].[deal_pipeline_stage] AS pipeline_labels
         ON pipeline_labels.stage_id = deal.deal_pipeline_stage_id
+
     LEFT JOIN 
         [_hubspot].[deal_company] AS deal_company
         ON deal_company.deal_id = deal.deal_id
+
     LEFT JOIN 
         [_hubspot].[company] AS company
         ON company.id = deal_company.company_id
-    LEFT JOIN 
-        [_hubspot].[line_item_deal] AS line_item_deal
-        ON deal.Deal_id = line_item_deal.deal_id
-    LEFT JOIN 
-        [_hubspot].[line_item] AS line_item
-        ON line_item_deal.line_item_id = line_item.id
+
     WHERE 
         pipeline_labels.label IN ('Closed won', 'Closed Won Approved', 'Renewal due', 'Cancelled Subscription') 
-        AND deal.deal_pipeline_id IN ('default', '1305376', '1313057', '2453638', '6617404', '17494655', '1305377')   
-    GROUP BY 
-        deal.Deal_id,
-        deal.deal_pipeline_id,
-        company.id,
-        company.property_name,
-        company.property_region_dfe_,
-        deal.deal_pipeline_stage_id,
-        aggregated.property_bundle,
-        aggregated.property_product_category,
-        aggregated.Total_Amount
+        AND deal.deal_pipeline_id IN ('default', '1305376', '1313057', '2453638', '6617404', '17494655', '1305377')AND  deal.Deal_id = 28970442398
+),
+SubscriptionData AS (
+    SELECT * 
+    FROM SubscriptionDataRaw
+    WHERE rn = 1
 ),
 RenewalCheck AS (
     SELECT 
@@ -179,6 +180,7 @@ FinalStatus AS (
 SELECT * 
 FROM FinalStatus
 ORDER BY property_name, MAX_Subscription_End_Date DESC;
+
 
 """
 
