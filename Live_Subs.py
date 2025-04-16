@@ -366,7 +366,7 @@ else:
     st.markdown(f"<h3 style='text-align: center;'>Simplified ACV View: {month_map[start_month]} to {month_map[end_month]} {selected_year}</h3>", unsafe_allow_html=True)
 
     # Data for the simplified chart
-    simple_labels = ["Opening ACV", "Expiring ACV", "Closing ACV"]
+    simple_labels = ["Opening ACV", "Expiring ACV", "New Business" "Closing ACV"]
     simple_values = [opening_acv, -expiring_acv, ,new_business_acv , closing_acv]
 
     fig_simple = go.Figure(go.Waterfall(
