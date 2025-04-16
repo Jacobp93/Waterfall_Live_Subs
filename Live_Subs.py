@@ -325,7 +325,7 @@ else:
             (filtered_df['deal_pipeline_id'] == "default")  
         ]['ACV'].sum()
 
-        closing_acv = opening_acv - expiring + renewed_acv + new_business_acv
+        closing_acv = opening_acv - expiring + new_business_acv
 
 
 
@@ -367,7 +367,7 @@ else:
 
     # Data for the simplified chart
     simple_labels = ["Opening ACV", "Expiring ACV", "Closing ACV"]
-    simple_values = [opening_acv, -expiring_acv, rolling_acv]
+    simple_values = [opening_acv, -expiring_acv, ,new_business_acv , closing_acv]
 
     fig_simple = go.Figure(go.Waterfall(
         x=simple_labels,
