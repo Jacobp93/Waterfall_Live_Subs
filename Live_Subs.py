@@ -299,46 +299,43 @@ else:
     (filtered_df['MAX_Subscription_End_Date'] >= (first_month_start - timedelta(days=1)))
 ]['ACV'].sum()
 
-    # Init rolling values for cumulative ACV changes
-    rolling_acv = opening_acv
+   # Loop through each month, calculate and accumulate ACV
+rolling_acv = opening_acv
+for month in range(start_month, end_month + 1):
+    # Logic for each month
+    month_start = pd.to_datetime(f"{selected_year}-{month:02d}-01").date()
+    month_end = (pd.to_datetime(month_start) + pd.offsets.MonthEnd(0)).date()
 
-    # Loop through the selected months and accumulate
-    for month in range(start_month, end_month + 1):
-        month_start = pd.to_datetime(f"{selected_year}-{month:02d}-01").date()
-        month_end = (pd.to_datetime(month_start) + pd.offsets.MonthEnd(0)).date()
+    expiring = filtered_df[
+        (filtered_df['Renewal_Year'] == selected_year) & 
+        (filtered_df['Renewal_Month'] == month)
+    ]['ACV'].sum()
 
-        # Expiring ACV (Anything expiring in the current month)
-        expiring = filtered_df[
-            (filtered_df['Renewal_Year'] == selected_year) &
-            (filtered_df['Renewal_Month'] == month)
-        ]['ACV'].sum()
+    renewed = filtered_df[
+        (filtered_df['Final_Renewal_Status'] == "Renewed") & 
+        (filtered_df['Renewal_Year'] == selected_year) & 
+        (filtered_df['Renewal_Month'] == month)
+    ]['ACV'].sum()
 
-        # Renewed ACV
-        renewed = filtered_df[
-            (filtered_df['Final_Renewal_Status'] == "Renewed") &
-            (filtered_df['Renewal_Year'] == selected_year) &
-            (filtered_df['Renewal_Month'] == month)
-        ]['ACV'].sum()
+    new_business = filtered_df[
+        (filtered_df['MIN_Subscription_Start_Date'] >= month_start) & 
+        (filtered_df['MIN_Subscription_Start_Date'] <= month_end) & 
+        (filtered_df['deal_pipeline_id'] == "default")
+    ]['ACV'].sum()
 
-        # New Business ACV (New subscriptions started in the current month)
-        new_business = filtered_df[
-            (filtered_df['MIN_Subscription_Start_Date'] >= month_start) &
-            (filtered_df['MIN_Subscription_Start_Date'] <= month_end) &
-            (filtered_df['deal_pipeline_id'] == "default")  
-        ]['ACV'].sum()
+    # Accumulate values
+    expiring_acv += expiring
+    renewed_acv += renewed
+    new_business_acv += new_business
+
+    # Update closing ACV after each month
+    closing_acv = rolling_acv - expiring + renewed + new_business
+    rolling_acv = closing_acv  # Prepare for the next month
 
         
 
-
-
-        # Accumulate values
-        expiring_acv += expiring
-        renewed_acv += renewed
-        new_business_acv += new_business
-        closing_acv = rolling_acv
-
         # Update the rolling ACV (Closing ACV for the month)
-        rolling_acv = rolling_acv - expiring + renewed + new_business
+    rolling_acv = rolling_acv - expiring + renewed + new_business
 
     # Prepare values for the chart (5 bars)
     labels = ["Opening ACV", "Expiring ACV", "Renewed ACV", "New Business ACV", "Closing ACV"]
