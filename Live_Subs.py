@@ -139,7 +139,7 @@ WITH SubscriptionDataRaw AS (
 
     WHERE 
         pipeline_labels.label IN ('Closed won', 'Closed Won Approved', 'Renewal due', 'Cancelled Subscription') 
-        AND deal.deal_pipeline_id IN ('default', '1305376', '1313057', '2453638', '6617404', '17494655', '1305377')AND  deal.Deal_id = 28970442398
+        AND deal.deal_pipeline_id IN ('default', '1305376', '1313057', '2453638', '6617404', '17494655', '1305377')
 ),
 SubscriptionData AS (
     SELECT * 
