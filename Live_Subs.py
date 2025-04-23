@@ -279,20 +279,10 @@ def calculate_acv_values(filtered_df, start_date, end_date, selected_year, start
     return opening_acv, expiring_acv, renewed_acv, new_business_acv, closing_acv
 
 
-# Define month names for selection
-month_map = {i: pd.to_datetime(f"2024-{i:02d}-01").strftime('%B') for i in range(1, 13)}
-
-start_month = st.sidebar.selectbox("Select Start Month", list(month_map.keys()), index=0, key="start_month_selector")
-end_month = st.sidebar.selectbox("Select End Month", list(month_map.keys()), index=11, key="end_month_selector")
-
-# Ensure start month is before end month
-if start_month > end_month:
-    st.sidebar.error("Start month should be before end month.")
-else:
-    # Calculate ACV values for the selected months
-    opening_acv, expiring_acv, renewed_acv, new_business_acv, closing_acv = calculate_acv_values(
-        filtered_df, start_date, end_date, selected_year, start_month, end_month
-    )
+# Calculate ACV values
+opening_acv, expiring_acv, renewed_acv, new_business_acv, closing_acv = calculate_acv_values(
+    filtered_df, start_date, end_date, selected_year, start_month, end_month
+)
 
 # Title with Selected Year
 st.markdown(f"<h2 style='text-align: center;'>ACV Breakdown for {selected_year}</h2>", unsafe_allow_html=True)
