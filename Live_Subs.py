@@ -143,7 +143,6 @@ WITH SubscriptionDataRaw AS (
         pipeline_labels.label IN ('Closed won', 'Closed Won Approved', 'Renewal due', 'Cancelled Subscription') 
         AND deal.deal_pipeline_id IN ('default', '1305376', '1313057', '2453638', '6617404', '17494655', '1305377')
 		
-		and deal.Deal_id = 29386095975
 
 
 ),
