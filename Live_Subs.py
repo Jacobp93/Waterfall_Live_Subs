@@ -112,9 +112,11 @@ WITH SubscriptionDataRaw AS (
                 MAX(line_item.property_subscription_end_date) AS MAX_Subscription_End_Date
             FROM 
                 [_hubspot].[line_item_deal] AS line_item_deal
-            INNER JOIN 
-                [_hubspot].[line_item] AS line_item
-                ON line_item_deal.line_item_id = line_item.id
+				INNER JOIN 
+			[_hubspot].[line_item] AS line_item
+			ON line_item_deal.line_item_id = line_item.id
+			AND line_item._fivetran_deleted = 0
+
             INNER JOIN 
                 [_hubspot].[product] AS product
                 ON line_item.product_id = product.id
@@ -140,6 +142,10 @@ WITH SubscriptionDataRaw AS (
     WHERE 
         pipeline_labels.label IN ('Closed won', 'Closed Won Approved', 'Renewal due', 'Cancelled Subscription') 
         AND deal.deal_pipeline_id IN ('default', '1305376', '1313057', '2453638', '6617404', '17494655', '1305377')
+		
+		and deal.Deal_id = 29386095975
+
+
 ),
 SubscriptionData AS (
     SELECT * 
