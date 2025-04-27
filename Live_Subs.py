@@ -327,8 +327,8 @@ else:
         renewed = filtered_df[
         (filtered_df['deal_pipeline_id'] == "1305377") &
         (filtered_df['deal_pipeline_stage_id'] == "4581651")&
-        (filtered_df['MIN_Subscription_Start_Date'] == start_date) &
-        (filtered_df['MIN_Subscription_Start_Date'] == start_date)
+        (filtered_df['MIN_Subscription_Start_Date'] >= start_date) & 
+        (filtered_df['MIN_Subscription_Start_Date'] <= end_date)
         ]['ACV'].sum()
 
         # New Business ACV (New subscriptions started in the current month)
