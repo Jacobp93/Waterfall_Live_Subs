@@ -207,6 +207,11 @@ df['Renewal_Period'] = pd.to_datetime(df['Renewal_Period'], errors='coerce')
 df['Renewal_Month'] = df['Renewal_Period'].dt.month.fillna(0).astype(int)
 df['Renewal_Year'] = df['Renewal_Period'].dt.year.fillna(0).astype(int)
 
+
+
+
+
+
 # Sidebar Filters
 st.sidebar.header("Filters")
 selected_region = st.sidebar.selectbox("Select Region",["All"] +list(df['property_region_dfe_'].dropna().unique()))
@@ -322,8 +327,8 @@ else:
         renewed = filtered_df[
         (filtered_df['deal_pipeline_id'] == "1305377") &
         (filtered_df['deal_pipeline_stage_id'] == "4581651")&
-        (filtered_df['Renewal_Year'] == selected_year) &
-        (filtered_df['Renewal_Month'] == month)
+        (filtered_df['MIN_Subscription_Start_Date'] == selected_year) &
+        (filtered_df['MIN_Subscription_Start_Date'] == month)
         ]['ACV'].sum()
 
         # New Business ACV (New subscriptions started in the current month)
