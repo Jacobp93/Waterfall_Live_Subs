@@ -237,7 +237,7 @@ expiring_acv = filtered_df[
         ]['ACV'].sum()
 
         # Renewed ACV
-        renewed = filtered_df[
+renewed = filtered_df[
         (filtered_df['deal_pipeline_id'] == "1305377") &
         (filtered_df['deal_pipeline_stage_id'] == "4581651")
         (filtered_df['Renewal_Year'] == selected_year)
