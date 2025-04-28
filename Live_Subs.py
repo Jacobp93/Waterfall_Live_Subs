@@ -343,7 +343,7 @@ else:
             (filtered_df['deal_pipeline_id'] == "default")  
         ]['ACV'].sum()
 
-        closing_acv = opening_acv + new_business_acv + -expiring_acv
+        closing_acv = opening_acv + new_business_acv + renewed_acv + -expiring_acv
 
 
 
