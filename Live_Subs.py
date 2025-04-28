@@ -321,8 +321,11 @@ else:
     renewed_acv = 0
     new_business_acv = 0
 
-    # Rolling ACV (starts with opening)
-    rolling_acv = opening_acv
+# ACV Calculations
+opening_acv = filtered_df[
+    (filtered_df['MIN_Subscription_Start_Date'] <= start_date) & 
+    (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) >= start_date)
+]['ACV'].sum()
 
     # Store closing ACV of each month to set opening for the next month
     monthly_closing_acv = {}
