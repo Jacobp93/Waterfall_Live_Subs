@@ -247,7 +247,7 @@ expiring_acv = filtered_df[
 renewed_acv = filtered_df[
         (filtered_df['deal_pipeline_id'] == "1305377") &
         (filtered_df['deal_pipeline_stage_id'] == "4581651") &
-        (filtered_df['Renewal_Year'] == selected_year)
+        (filtered_df['Min_Year'] == selected_year)
         ]['ACV'].sum()
 
 
@@ -333,7 +333,7 @@ else:
         # Renewed ACV
         renewed = filtered_df[
         (filtered_df['deal_pipeline_id'] == "1305377") &
-        (filtered_df['deal_pipeline_stage_id'] == "4581651")
+        (filtered_df['deal_pipeline_stage_id'] == "4581651") &
         (filtered_df['Renewal_Year'] == selected_year) &
         (filtered_df['Renewal_Month'] == month)
         ]['ACV'].sum()
