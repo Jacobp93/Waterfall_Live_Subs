@@ -241,9 +241,10 @@ opening_acv = filtered_df[
 ]['ACV'].sum()
 
 expiring_acv = filtered_df[
-    (filtered_df['MAX_Subscription_End_Date'] >= start_date) & 
+    (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) >= start_date) & 
     (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) <= end_date)
 ]['ACV'].sum()
+
 
 
         # Renewed ACV
