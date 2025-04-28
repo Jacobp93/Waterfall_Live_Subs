@@ -296,6 +296,9 @@ fig_acv.update_layout(
 
 st.plotly_chart(fig_acv)
 
+# END OF CHARTS AND START OF 12 MONTH CHART
+
+
 # Define month names
 month_map = {i: pd.to_datetime(f"{selected_year}-{i:02d}-01").strftime('%B') for i in range(1, 13)}
 
