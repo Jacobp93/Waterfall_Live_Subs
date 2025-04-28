@@ -314,7 +314,7 @@ else:
 
     opening_acv = filtered_df[
         (filtered_df['MIN_Subscription_Start_Date'] <= first_month_start) & 
-        (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) > first_month_start)
+        (filtered_df['MAX_Subscription_End_Date'] >= first_month_start)
     ]['ACV'].sum()
 
     # Initialize totals
