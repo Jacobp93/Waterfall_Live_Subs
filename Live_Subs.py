@@ -322,10 +322,10 @@ else:
     new_business_acv = 0
 
 # ACV Calculations
-opening_acv = filtered_df[
+    opening_acv = filtered_df[
     (filtered_df['MIN_Subscription_Start_Date'] <= start_date) & 
     (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) >= start_date)
-]['ACV'].sum()
+    ]['ACV'].sum()
 
     # Store closing ACV of each month to set opening for the next month
     monthly_closing_acv = {}
