@@ -349,11 +349,11 @@ else:
 
         # Accumulate values
         expiring_acv += expiring
-        renewed_acv += renewed
+        renewed_acv += renewed_acv
         new_business_acv += new_business
         
         # Update the rolling ACV (Closing ACV for the month)
-        rolling_acv = rolling_acv - expiring + renewed + new_business
+        rolling_acv = rolling_acv - expiring + renewed_acv + new_business
 
     # Prepare values for the chart (5 bars)
     labels = ["Opening ACV", "Expiring ACV", "Renewed ACV", "New Business ACV", "Closing ACV"]
