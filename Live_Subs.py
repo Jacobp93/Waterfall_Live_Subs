@@ -390,7 +390,7 @@ else:
     
     # (your current code as it is...)
 
-st.plotly_chart(fig)  # <-- your first chart ends here
+st.plotly_chart(fig, key="partial_year_chart")  # <-- first chart
 
 
 # ===================
@@ -466,5 +466,5 @@ full_fig.update_layout(
     showlegend=False
 )
 
-st.plotly_chart(full_fig)
+st.plotly_chart(full_fig, key="full_year_chart")  # <-- second chart
 
