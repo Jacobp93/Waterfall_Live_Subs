@@ -379,7 +379,7 @@ else:
     
     st.plotly_chart(fig)
 
-
+'''
 
     # Third Chart: Opening ACV, Expiring ACV, and Closing ACV
     st.markdown(f"<h3 style='text-align: center;'>Simplified ACV View: {month_map[start_month]} to {month_map[end_month]} {selected_year}</h3>", unsafe_allow_html=True)
@@ -404,3 +404,5 @@ else:
     )
 
     st.plotly_chart(fig_simple)
+
+'''
