@@ -235,10 +235,11 @@ if selected_region != "All":
     filtered_df = filtered_df[filtered_df['property_region_dfe_'] == selected_region]
 
 # ACV Calculations
-opening_acv = filtered_df[(filtered_df['MIN_Subscription_Start_Date'] <= start_date) & 
-                          (filtered_df['MAX_Subscription_End_Date'] >= start_date)]['ACV'].sum()
+    opening_acv = filtered_df[
+    (filtered_df['MIN_Subscription_Start_Date'] <= start_date) & 
+    (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) >= start_date)
+        ]['ACV'].sum()
 
- # Expiring ACV (Anything expiring in the current month)
 expiring_acv = filtered_df[
             (filtered_df['Renewal_Year'] == selected_year)
         ]['ACV'].sum()
