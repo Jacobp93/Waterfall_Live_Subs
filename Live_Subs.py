@@ -296,16 +296,6 @@ fig_acv.update_layout(
 
 st.plotly_chart(fig_acv)
 
-
-
-
-import streamlit as st
-import pandas as pd
-import plotly.graph_objects as go
-
-# Assuming 'selected_year' is initialized as a static year or from a Streamlit input
-selected_year = st.sidebar.selectbox("Select Year", [2024, 2025], index=0)
-
 # Define month names for the selected year
 month_map = {i: pd.to_datetime(f"{selected_year}-{i:02d}-01").strftime('%B') for i in range(1, 13)}
 
@@ -313,53 +303,55 @@ month_map = {i: pd.to_datetime(f"{selected_year}-{i:02d}-01").strftime('%B') for
 start_month = st.sidebar.selectbox("Select Start Month", list(month_map.keys()), index=0, key="start_month_selector")
 end_month = st.sidebar.selectbox("Select End Month", list(month_map.keys()), index=11, key="end_month_selector")
 
-# Ensure start_month is less than or equal to end_month
+
+
+
 if start_month > end_month:
     st.sidebar.error("Start month should be before end month.")
 else:
     st.markdown(f"<h2 style='text-align: center;'>ACV Breakdown for {month_map[start_month]} to {month_map[end_month]} {selected_year}</h2>", unsafe_allow_html=True)
 
-    # Convert start dates to pd.Timestamp for proper comparison
-    first_month_start = pd.to_datetime(f"{selected_year}-{start_month:02d}-01")  # pd.Timestamp
-    rolling_acv = 0
-
-    # Opening ACV at the start of first month
-    opening_acv = filtered_df[  # Assuming 'filtered_df' is the dataframe you're working with
+    # Calculate the starting date of the first month
+    first_month_start = pd.to_datetime(f"{selected_year}-{start_month:02d}-01").date()
+    
+    
+    # Calculate Opening ACV for the first month
+    opening_acv = filtered_df[
         (filtered_df['MIN_Subscription_Start_Date'] <= first_month_start) & 
         (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) > first_month_start)
     ]['ACV'].sum()
 
-    # Initialize totals
+    # Initialize totals for each category
     expiring_acv = 0
     renewed_acv = 0
     new_business_acv = 0
 
-    # Loop through months and calculate expiring, renewed, and new business ACV
-    for month in range(start_month, end_month + 1):
-        month_start = pd.to_datetime(f"{selected_year}-{month:02d}-01")  # Convert to pd.Timestamp
-        month_end = (month_start + pd.offsets.MonthEnd(0)).date()  # Ensure end is also pd.Timestamp
+    # Initialize rolling ACV
+    rolling_acv = opening_acv
 
-        # Convert the end of the month to pd.Timestamp for comparison
-        month_end = pd.to_datetime(month_end)
+    # Loop through each month in the selected range
+    for month in range(start_month, end_month + 1):
+        month_start = pd.to_datetime(f"{selected_year}-{month:02d}-01").date()
+        month_end = (pd.to_datetime(month_start) + pd.offsets.MonthEnd(0)).date()
 
         # Expiring ACV for this month (subscriptions that end in this month)
-        expiring = filtered_df[  # Assuming 'filtered_df' is the dataframe you're working with
+        expiring = filtered_df[
             (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) >= month_start) & 
             (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) <= month_end)
         ]['ACV'].sum()
 
         # Renewed ACV for this month (renewals booked for the selected year and month)
-        renewed = filtered_df[  # Assuming 'filtered_df' is the dataframe you're working with
+        renewed = filtered_df[
             (filtered_df['deal_pipeline_id'] == "1305377") & 
-            (filtered_df['deal_pipeline_stage_id'] == "4581651") & 
-            (filtered_df['Min_Year'] == selected_year) & 
+            (filtered_df['deal_pipeline_stage_id'] == "4581651") &
+            (filtered_df['Min_Year'] == selected_year) &
             (filtered_df['Min_Month'] == month)
         ]['ACV'].sum()
 
         # New Business ACV for this month (new subscriptions that start in this month)
-        new_business = filtered_df[  # Assuming 'filtered_df' is the dataframe you're working with
+        new_business = filtered_df[
             (filtered_df['MIN_Subscription_Start_Date'] >= month_start) & 
-            (filtered_df['MIN_Subscription_Start_Date'] <= month_end) & 
+            (filtered_df['MIN_Subscription_Start_Date'] <= month_end) &
             (filtered_df['deal_pipeline_id'] == "default")
         ]['ACV'].sum()
 
@@ -373,8 +365,7 @@ else:
 
     # Calculate Closing ACV at the end of the last selected month
     final_month_end = pd.to_datetime(f"{selected_year}-{end_month:02d}-01") + pd.offsets.MonthEnd(0)
-
-    closing_acv = filtered_df[  # Assuming 'filtered_df' is the dataframe you're working with
+    closing_acv = filtered_df[
         (filtered_df['MIN_Subscription_Start_Date'] <= final_month_end) & 
         (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) > final_month_end)
     ]['ACV'].sum()
