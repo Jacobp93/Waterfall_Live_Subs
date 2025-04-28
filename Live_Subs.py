@@ -238,7 +238,7 @@ if selected_region != "All":
     opening_acv = filtered_df[
     (filtered_df['MIN_Subscription_Start_Date'] <= start_date) & 
     (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) >= start_date)
-        ]['ACV'].sum()
+]['ACV'].sum()
 
 expiring_acv = filtered_df[
             (filtered_df['Renewal_Year'] == selected_year)
