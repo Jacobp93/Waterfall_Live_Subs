@@ -207,6 +207,12 @@ df['Renewal_Period'] = pd.to_datetime(df['Renewal_Period'], errors='coerce')
 df['Renewal_Month'] = df['Renewal_Period'].dt.month.fillna(0).astype(int)
 df['Renewal_Year'] = df['Renewal_Period'].dt.year.fillna(0).astype(int)
 
+
+
+df['Min_Month'] = df['MIN_Subscription_Start_Date'].dt.month.fillna(0).astype(int)
+df['Min_Year'] = df['MIN_Subscription_Start_Date'].dt.year.fillna(0).astype(int)
+
+
 # Sidebar Filters
 st.sidebar.header("Filters")
 selected_region = st.sidebar.selectbox("Select Region",["All"] +list(df['property_region_dfe_'].dropna().unique()))
