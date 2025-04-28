@@ -348,7 +348,7 @@ else:
 
         # Accumulate values
         expiring_acv += expiring
-        renewed_acv += renewed_acv
+        renewed_acv += renewed
         new_business_acv += new_business
         
         # Update the rolling ACV (Closing ACV for the month)
