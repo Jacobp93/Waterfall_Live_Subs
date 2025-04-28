@@ -324,6 +324,9 @@ else:
     # Rolling ACV (starts with opening)
     rolling_acv = opening_acv
 
+    # Store closing ACV of each month to set opening for the next month
+    monthly_closing_acv = {}
+
     for month in range(start_month, end_month + 1):
         month_start = pd.to_datetime(f"{selected_year}-{month:02d}-01").date()
         month_end = (pd.to_datetime(month_start) + pd.offsets.MonthEnd(0)).date()
@@ -335,10 +338,10 @@ else:
         ]['ACV'].sum()
 
         # Renewed ACV: renewals booked starting this month
-        renewed = filtered_df[
+        renewed = filtered_df[ 
             (filtered_df['deal_pipeline_id'] == "1305377") & 
-            (filtered_df['deal_pipeline_stage_id'] == "4581651") &
-            (filtered_df['Min_Year'] == selected_year) &
+            (filtered_df['deal_pipeline_stage_id'] == "4581651") & 
+            (filtered_df['Min_Year'] == selected_year) & 
             (filtered_df['Min_Month'] == month)
         ]['ACV'].sum()
 
@@ -357,14 +360,11 @@ else:
         # Update rolling ACV (important: only this month's changes)
         rolling_acv = rolling_acv - expiring + renewed + new_business
 
-    # Closing ACV = active subs at the END of last month
-    final_month_end = pd.to_datetime(f"{selected_year}-{end_month:02d}-01") + pd.offsets.MonthEnd(0)
-    final_month_end = final_month_end.date()
+        # Store the closing ACV for the current month to use as the opening for the next month
+        monthly_closing_acv[month] = rolling_acv
 
-    closing_acv = filtered_df[
-        (filtered_df['MIN_Subscription_Start_Date'] <= final_month_end) & 
-        (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) > final_month_end)
-    ]['ACV'].sum()
+    # Now the closing ACV for the last month is the value we need
+    closing_acv = monthly_closing_acv[end_month]
 
     # Create Waterfall chart
     labels = ["Opening ACV", "Expiring ACV", "Renewed ACV", "New Business ACV", "Closing ACV"]
@@ -386,5 +386,3 @@ else:
     )
 
     st.plotly_chart(fig)
-
-
