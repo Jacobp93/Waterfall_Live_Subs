@@ -359,6 +359,7 @@ else:
 
     # Calculate Closing ACV at the end of the last selected month
     final_month_end = pd.to_datetime(f"{selected_year}-{end_month:02d}-01") + pd.offsets.MonthEnd(0)
+
     closing_acv = filtered_df[
         (filtered_df['MIN_Subscription_Start_Date'] <= final_month_end) & 
         (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) > final_month_end)
