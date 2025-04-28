@@ -310,10 +310,9 @@ if start_month > end_month:
 else:
     st.markdown(f"<h2 style='text-align: center;'>ACV Breakdown for {month_map[start_month]} to {month_map[end_month]} {selected_year}</h2>", unsafe_allow_html=True)
 
-    # Calculate first month start
+    # Opening ACV for the start of the first month (manually set or calculated)
     first_month_start = pd.to_datetime(f"{selected_year}-{start_month:02d}-01").date()
-    
-    # Opening ACV at the start of first month
+
     opening_acv = filtered_df[
         (filtered_df['MIN_Subscription_Start_Date'] <= first_month_start) & 
         (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) > first_month_start)
@@ -330,16 +329,16 @@ else:
     # Store closing ACV of each month to set opening for the next month
     monthly_closing_acv = {}
 
+    # Loop through each month
     for month in range(start_month, end_month + 1):
         month_start = pd.to_datetime(f"{selected_year}-{month:02d}-01").date()
         month_end = (pd.to_datetime(month_start) + pd.offsets.MonthEnd(0)).date()
 
-# Expiring ACV: subscriptions that end in this month
+        # Expiring ACV: subscriptions that end in this month
         expiring = filtered_df[
-    (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) >= month_start) & 
-    (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) <= month_end)
-    ]['ACV'].sum()
-
+            (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) >= month_start) & 
+            (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) <= month_end)
+        ]['ACV'].sum()
 
         # Renewed ACV: renewals booked starting this month
         renewed = filtered_df[ 
@@ -390,6 +389,7 @@ else:
     )
 
     st.plotly_chart(fig)
+
     
     
     # Initialize lists for labels and values
