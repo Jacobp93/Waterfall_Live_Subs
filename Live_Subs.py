@@ -330,14 +330,12 @@ else:
             (filtered_df['Renewal_Month'] == month)
         ]['ACV'].sum()
 
-        # Renewed ACV
-        renewed = filtered_df[
+    renewed = filtered_df[
         (filtered_df['deal_pipeline_id'] == "1305377") &
         (filtered_df['deal_pipeline_stage_id'] == "4581651") &
-        (filtered_df['Renewal_Year'] == selected_year) &
-        (filtered_df['Renewal_Month'] == month)
+        (filtered_df['Min_Year'] == selected_year) &
+        (filtered_df['Min_Month'] == selected_year)
         ]['ACV'].sum()
-
         # New Business ACV (New subscriptions started in the current month)
         new_business = filtered_df[
             (filtered_df['MIN_Subscription_Start_Date'] >= month_start) &
