@@ -318,7 +318,7 @@ else:
     ]['ACV'].sum()
 
     # Init rolling values for cumulative ACV changes
-    rolling_acv = opening_acv
+    rolling_acv = opening_acv + new_business_acv + renewed_acv + -expiring_acv
 
     # Loop through the selected months and accumulate
     for month in range(start_month, end_month + 1):
