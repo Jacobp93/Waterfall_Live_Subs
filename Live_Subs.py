@@ -334,7 +334,7 @@ else:
         month_start = pd.to_datetime(f"{selected_year}-{month:02d}-01").date()
         month_end = (pd.to_datetime(month_start) + pd.offsets.MonthEnd(0)).date()
    # Expiring
-         expiring = filtered_df[
+        expiring = filtered_df[
         (filtered_df['MAX_Subscription_End_Date']>= month_start) & 
         (filtered_df['MAX_Subscription_End_Date']<= month_end)
     ]['ACV'].sum()
