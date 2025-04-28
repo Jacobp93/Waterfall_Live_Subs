@@ -334,7 +334,7 @@ else:
         (filtered_df['deal_pipeline_id'] == "1305377") &
         (filtered_df['deal_pipeline_stage_id'] == "4581651") &
         (filtered_df['Min_Month'] == month) &
-        (filtered_df['Min_Year'] == selected_year) &
+        (filtered_df['Min_Year'] == selected_year) 
         ]['ACV'].sum()
         # New Business ACV (New subscriptions started in the current month)
         new_business = filtered_df[
