@@ -235,7 +235,7 @@ if selected_region != "All":
     filtered_df = filtered_df[filtered_df['property_region_dfe_'] == selected_region]
 
 # ACV Calculations
-    opening_acv = filtered_df[
+opening_acv = filtered_df[
     (filtered_df['MIN_Subscription_Start_Date'] <= start_date) & 
     (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) >= start_date)
 ]['ACV'].sum()
