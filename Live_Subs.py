@@ -237,12 +237,12 @@ if selected_region != "All":
 # ACV Calculations
 opening_acv = filtered_df[
     (filtered_df['MIN_Subscription_Start_Date'] <= start_date) & 
-    (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) >= start_date)
+    (filtered_df['MAX_Subscription_End_Date'] >= start_date)
 ]['ACV'].sum()
 
 expiring_acv = filtered_df[
-    (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) >= start_date) & 
-    (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) <= end_date)
+    (filtered_df['MAX_Subscription_End_Date']  >= start_date) & 
+    (filtered_df['MAX_Subscription_End_Date']  <= end_date)
 ]['ACV'].sum()
 
 
@@ -263,7 +263,7 @@ closing_date = pd.to_datetime(f"{selected_year}-12-31").date()
 
 closing_acv = filtered_df[
     (filtered_df['MIN_Subscription_Start_Date'] <= closing_date) & 
-    (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) > closing_date)
+    (filtered_df['MAX_Subscription_End_Date'] > closing_date)
 ]['ACV'].sum()
 
 
@@ -336,8 +336,8 @@ else:
 
         # Expiring ACV: subscriptions that end in this month
         expiring = filtered_df[
-            (filtered_df['MAX_Subscription_End_Date'] >= month_start) & 
-            (filtered_df['MAX_Subscription_End_Date'] <= month_end)
+            (filtered_df['MAX_Subscription_End_Date']) & 
+            (filtered_df['MAX_Subscription_End_Date'])
         ]['ACV'].sum()
 
         # Renewed ACV: renewals booked starting this month
