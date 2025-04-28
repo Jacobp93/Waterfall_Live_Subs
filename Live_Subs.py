@@ -386,32 +386,3 @@ else:
     )
 
     st.plotly_chart(fig)
-
-
-'''
-
-    # Third Chart: Opening ACV, Expiring ACV, and Closing ACV
-    st.markdown(f"<h3 style='text-align: center;'>Simplified ACV View: {month_map[start_month]} to {month_map[end_month]} {selected_year}</h3>", unsafe_allow_html=True)
-
-    # Data for the simplified chart
-    simple_labels = ["Opening ACV", "Expiring ACV", "New Business" , "Closing ACV"]
-    simple_values = [opening_acv, -expiring_acv,new_business_acv , closing_acv]
-
-    fig_simple = go.Figure(go.Waterfall(
-        x=simple_labels,
-        y=simple_values,
-        text=[f"£{v:,.2f}" for v in simple_values],
-        decreasing={"marker": {"color": "red"}},
-        increasing={"marker": {"color": "green"}},
-        connector={"line": {"color": "gray"}}
-    ))
-
-    fig_simple.update_layout(
-        title="Simplified ACV Waterfall: Opening → Expiring → Closing",
-        yaxis_title="ACV (£)",
-        showlegend=False
-    )
-
-    st.plotly_chart(fig_simple)
-
-'''
