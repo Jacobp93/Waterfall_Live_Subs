@@ -209,8 +209,9 @@ df['Renewal_Year'] = df['Renewal_Period'].dt.year.fillna(0).astype(int)
 
 
 
-df['Min_Month'] = df['MIN_Subscription_Start_Date'].dt.month.fillna(0).astype(int)
-df['Min_Year'] = df['MIN_Subscription_Start_Date'].dt.year.fillna(0).astype(int)
+df['Min_Month'] = df['MIN_Subscription_Start_Date'].apply(lambda x: x.month if pd.notnull(x) else 0)
+df['Min_Year'] = df['MIN_Subscription_Start_Date'].apply(lambda x: x.year if pd.notnull(x) else 0)
+
 
 
 # Sidebar Filters
