@@ -296,51 +296,45 @@ fig_acv.update_layout(
 
 st.plotly_chart(fig_acv)
 
-# Define month names for the selected year
+# Define month names
 month_map = {i: pd.to_datetime(f"{selected_year}-{i:02d}-01").strftime('%B') for i in range(1, 13)}
 
-# Select start and end months from sidebar
 start_month = st.sidebar.selectbox("Select Start Month", list(month_map.keys()), index=0, key="start_month_selector")
 end_month = st.sidebar.selectbox("Select End Month", list(month_map.keys()), index=11, key="end_month_selector")
-
-
-
 
 if start_month > end_month:
     st.sidebar.error("Start month should be before end month.")
 else:
     st.markdown(f"<h2 style='text-align: center;'>ACV Breakdown for {month_map[start_month]} to {month_map[end_month]} {selected_year}</h2>", unsafe_allow_html=True)
 
-    # Calculate the starting date of the first month
+    # Calculate first month start
     first_month_start = pd.to_datetime(f"{selected_year}-{start_month:02d}-01").date()
     
-    
-    # Calculate Opening ACV for the first month
+    # Opening ACV at the start of first month
     opening_acv = filtered_df[
         (filtered_df['MIN_Subscription_Start_Date'] <= first_month_start) & 
         (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) > first_month_start)
     ]['ACV'].sum()
 
-    # Initialize totals for each category
+    # Initialize totals
     expiring_acv = 0
     renewed_acv = 0
     new_business_acv = 0
 
-    # Initialize rolling ACV
+    # Rolling ACV (starts with opening)
     rolling_acv = opening_acv
 
-    # Loop through each month in the selected range
     for month in range(start_month, end_month + 1):
         month_start = pd.to_datetime(f"{selected_year}-{month:02d}-01").date()
         month_end = (pd.to_datetime(month_start) + pd.offsets.MonthEnd(0)).date()
 
-        # Expiring ACV for this month (subscriptions that end in this month)
+        # Expiring ACV: subscriptions that end in this month
         expiring = filtered_df[
             (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) >= month_start) & 
             (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) <= month_end)
         ]['ACV'].sum()
 
-        # Renewed ACV for this month (renewals booked for the selected year and month)
+        # Renewed ACV: renewals booked starting this month
         renewed = filtered_df[
             (filtered_df['deal_pipeline_id'] == "1305377") & 
             (filtered_df['deal_pipeline_stage_id'] == "4581651") &
@@ -348,7 +342,7 @@ else:
             (filtered_df['Min_Month'] == month)
         ]['ACV'].sum()
 
-        # New Business ACV for this month (new subscriptions that start in this month)
+        # New Business ACV: new business starting this month
         new_business = filtered_df[
             (filtered_df['MIN_Subscription_Start_Date'] >= month_start) & 
             (filtered_df['MIN_Subscription_Start_Date'] <= month_end) &
@@ -360,21 +354,22 @@ else:
         renewed_acv += renewed
         new_business_acv += new_business
 
-        # Update rolling ACV (considering this month's changes)
+        # Update rolling ACV (important: only this month's changes)
         rolling_acv = rolling_acv - expiring + renewed + new_business
 
-    # Calculate Closing ACV at the end of the last selected month
+    # Closing ACV = active subs at the END of last month
     final_month_end = pd.to_datetime(f"{selected_year}-{end_month:02d}-01") + pd.offsets.MonthEnd(0)
+    final_month_end = final_month_end.date()
+
     closing_acv = filtered_df[
         (filtered_df['MIN_Subscription_Start_Date'] <= final_month_end) & 
         (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) > final_month_end)
     ]['ACV'].sum()
 
-    # Prepare data for Waterfall chart
+    # Create Waterfall chart
     labels = ["Opening ACV", "Expiring ACV", "Renewed ACV", "New Business ACV", "Closing ACV"]
     values = [opening_acv, -expiring_acv, renewed_acv, new_business_acv, closing_acv]
 
-    # Create Waterfall chart
     fig = go.Figure(go.Waterfall(
         x=labels,
         y=values,
@@ -390,5 +385,6 @@ else:
         showlegend=False
     )
 
-    # Plot the Waterfall chart
     st.plotly_chart(fig)
+
+
