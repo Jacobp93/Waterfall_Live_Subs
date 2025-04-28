@@ -386,3 +386,85 @@ else:
     )
 
     st.plotly_chart(fig)
+    
+    
+    # (your current code as it is...)
+
+st.plotly_chart(fig)  # <-- your first chart ends here
+
+
+# ===================
+# Now, Full 12-Month View
+# ===================
+
+st.markdown(f"<h2 style='text-align: center;'>Full Year ACV Breakdown ({selected_year})</h2>", unsafe_allow_html=True)
+
+# Full year start
+full_year_start = pd.to_datetime(f"{selected_year}-01-01").date()
+
+# Opening ACV at start of the year
+full_opening_acv = filtered_df[
+    (filtered_df['MIN_Subscription_Start_Date'] <= full_year_start) & 
+    (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) > full_year_start)
+]['ACV'].sum()
+
+# Initialize
+full_expiring_acv = 0
+full_renewed_acv = 0
+full_new_business_acv = 0
+full_rolling_acv = full_opening_acv
+full_monthly_closing_acv = {}
+
+for month in range(1, 13):  # January to December
+    month_start = pd.to_datetime(f"{selected_year}-{month:02d}-01").date()
+    month_end = (pd.to_datetime(month_start) + pd.offsets.MonthEnd(0)).date()
+
+    expiring = filtered_df[
+        (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) >= month_start) &
+        (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) <= month_end)
+    ]['ACV'].sum()
+
+    renewed = filtered_df[
+        (filtered_df['deal_pipeline_id'] == "1305377") & 
+        (filtered_df['deal_pipeline_stage_id'] == "4581651") &
+        (filtered_df['Min_Year'] == selected_year) &
+        (filtered_df['Min_Month'] == month)
+    ]['ACV'].sum()
+
+    new_business = filtered_df[
+        (filtered_df['MIN_Subscription_Start_Date'] >= month_start) &
+        (filtered_df['MIN_Subscription_Start_Date'] <= month_end) &
+        (filtered_df['deal_pipeline_id'] == "default")
+    ]['ACV'].sum()
+
+    full_expiring_acv += expiring
+    full_renewed_acv += renewed
+    full_new_business_acv += new_business
+
+    full_rolling_acv = full_rolling_acv - expiring + renewed + new_business
+    full_monthly_closing_acv[month] = full_rolling_acv
+
+# Closing ACV at end of December
+full_closing_acv = full_monthly_closing_acv[12]
+
+# Create Full Year Waterfall
+full_labels = ["Opening ACV", "Expiring ACV", "Renewed ACV", "New Business ACV", "Closing ACV"]
+full_values = [full_opening_acv, -full_expiring_acv, full_renewed_acv, full_new_business_acv, full_closing_acv]
+
+full_fig = go.Figure(go.Waterfall(
+    x=full_labels,
+    y=full_values,
+    text=[f"£{v:,.2f}" for v in full_values],
+    decreasing={"marker": {"color": "red"}},
+    increasing={"marker": {"color": "green"}},
+    connector={"line": {"color": "gray"}}
+))
+
+full_fig.update_layout(
+    title=f"ACV Waterfall: Full Year {selected_year}",
+    yaxis_title="ACV (£)",
+    showlegend=False
+)
+
+st.plotly_chart(full_fig)
+
