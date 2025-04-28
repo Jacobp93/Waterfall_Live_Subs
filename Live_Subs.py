@@ -336,8 +336,8 @@ else:
 
         # Expiring ACV: subscriptions that end in this month
         expiring = filtered_df[
-            (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) >= month_start) & 
-            (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) <= month_end)
+            (filtered_df['MAX_Subscription_End_Date'] >= month_start) & 
+            (filtered_df['MAX_Subscription_End_Date'] <= month_end)
         ]['ACV'].sum()
 
         # Renewed ACV: renewals booked starting this month
