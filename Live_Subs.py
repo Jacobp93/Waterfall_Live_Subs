@@ -333,12 +333,11 @@ else:
     for month in range(start_month, end_month + 1):
         month_start = pd.to_datetime(f"{selected_year}-{month:02d}-01").date()
         month_end = (pd.to_datetime(month_start) + pd.offsets.MonthEnd(0)).date()
-
-        # Expiring ACV: subscriptions that end in this month
-        expiring = filtered_df[
-            (filtered_df['MAX_Subscription_End_Date']) & 
-            (filtered_df['MAX_Subscription_End_Date'])
-        ]['ACV'].sum()
+   # Expiring
+         expiring = filtered_df[
+        (filtered_df['MAX_Subscription_End_Date']>= month_start) & 
+        (filtered_df['MAX_Subscription_End_Date']<= month_end)
+    ]['ACV'].sum()
 
         # Renewed ACV: renewals booked starting this month
         renewed = filtered_df[ 
@@ -405,8 +404,8 @@ for month in range(1, 13):
 
     # Expiring
     expiring = filtered_df[
-        (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) >= month_start) & 
-        (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) <= month_end)
+        (filtered_df['MAX_Subscription_End_Date']>= month_start) & 
+        (filtered_df['MAX_Subscription_End_Date']<= month_end)
     ]['ACV'].sum()
 
     # Renewed
