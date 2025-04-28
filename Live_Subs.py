@@ -328,6 +328,9 @@ else:
         month_start = pd.to_datetime(f"{selected_year}-{month:02d}-01")  # Convert to pd.Timestamp
         month_end = (month_start + pd.offsets.MonthEnd(0)).date()  # Ensure end is also pd.Timestamp
 
+        # Convert the end of the month to pd.Timestamp for comparison
+        month_end = pd.to_datetime(month_end)
+
         # Expiring ACV for this month (subscriptions that end in this month)
         expiring = filtered_df[
             (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) >= month_start) & 
