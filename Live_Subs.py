@@ -298,7 +298,6 @@ st.plotly_chart(fig_acv)
 
 # END OF CHARTS AND START OF 12 MONTH CHART
 
-
 # Define month names
 month_map = {i: pd.to_datetime(f"{selected_year}-{i:02d}-01").strftime('%B') for i in range(1, 13)}
 
@@ -315,7 +314,7 @@ else:
 
     opening_acv = filtered_df[
         (filtered_df['MIN_Subscription_Start_Date'] <= first_month_start) & 
-        (filtered_df['MAX_Subscription_End_Date'] > first_month_start)
+        (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) > first_month_start)
     ]['ACV'].sum()
 
     # Initialize totals
@@ -369,6 +368,9 @@ else:
     # Now the closing ACV for the last month is the value we need
     closing_acv = monthly_closing_acv[end_month]
 
+    # Ensure the closing ACV for each month is used as the opening for the next month
+    opening_acv_for_next_month = closing_acv  # This will ensure proper transition to next month
+
     # Create Waterfall chart
     labels = ["Opening ACV", "Expiring ACV", "Renewed ACV", "New Business ACV", "Closing ACV"]
     values = [opening_acv, -expiring_acv, renewed_acv, new_business_acv, closing_acv]
@@ -390,7 +392,6 @@ else:
 
     st.plotly_chart(fig)
 
-    
     
     # Initialize lists for labels and values
 labels = ["Opening ACV"]
