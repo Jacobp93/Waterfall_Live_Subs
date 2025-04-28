@@ -259,7 +259,13 @@ new_business_acv = filtered_df[(filtered_df['MIN_Subscription_Start_Date'] >= st
                                (filtered_df['MIN_Subscription_Start_Date'] <= end_date) & 
                                (filtered_df['deal_pipeline_id'] == "default")]['ACV'].sum()
 
-closing_acv = opening_acv + new_business_acv + renewed_acv + -expiring_acv
+closing_date = pd.to_datetime(f"{selected_year}-12-31").date()
+
+closing_acv = filtered_df[
+    (filtered_df['MIN_Subscription_Start_Date'] <= closing_date) & 
+    (filtered_df['MAX_Subscription_End_Date'] + pd.Timedelta(days=1) > closing_date)
+]['ACV'].sum()
+
 
 # Title with Selected Year
 st.markdown(f"<h2 style='text-align: center;'>ACV Breakdown for {selected_year}</h2>", unsafe_allow_html=True)
